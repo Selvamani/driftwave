@@ -1,0 +1,126 @@
+/**
+ * Driftwave Theme System
+ * 6 themes: ocean (default), aurora, sunset, midnight, sakura, paper
+ * CSS custom properties — swap the data-theme attribute on <html>
+ */
+
+/* ── Base token structure ── */
+:root {
+  --dw-bg:        #080a0e;
+  --dw-surface:   #0d1117;
+  --dw-card:      #111722;
+  --dw-border:    #1c2535;
+  --dw-border2:   #243045;
+  --dw-text:      #e8edf5;
+  --dw-muted:     #4a5568;
+  --dw-muted2:    #6b7a94;
+  --dw-accent:    #38bdf8;
+  --dw-accent2:   #818cf8;
+  --dw-accent-fg: #000000;
+  --dw-positive:  #34d399;
+  --dw-warning:   #fbbf24;
+  --dw-error:     #f87171;
+
+  /* Lang badge colors */
+  --dw-lang-ta:   #38bdf8;
+  --dw-lang-hi:   #fb923c;
+  --dw-lang-ko:   #f472b6;
+  --dw-lang-en:   #34d399;
+  --dw-lang-ar:   #a78bfa;
+  --dw-lang-te:   #fbbf24;
+  --dw-lang-ml:   #4ade80;
+
+  --dw-radius:    12px;
+  --dw-radius-sm: 8px;
+  --dw-radius-lg: 16px;
+}
+
+/* ── OCEAN (default dark blue) ── */
+[data-theme="ocean"] {
+  --dw-bg:        #080a0e;
+  --dw-surface:   #0d1117;
+  --dw-card:      #111722;
+  --dw-border:    #1c2535;
+  --dw-border2:   #243045;
+  --dw-text:      #e8edf5;
+  --dw-muted:     #4a5568;
+  --dw-muted2:    #6b7a94;
+  --dw-accent:    #38bdf8;
+  --dw-accent2:   #818cf8;
+  --dw-accent-fg: #000000;
+}
+
+/* ── AURORA (green-teal) ── */
+[data-theme="aurora"] {
+  --dw-bg:        #060d0a;
+  --dw-surface:   #0a1410;
+  --dw-card:      #0f1e17;
+  --dw-border:    #1a2e22;
+  --dw-border2:   #22402e;
+  --dw-text:      #e4f0eb;
+  --dw-muted:     #3d5248;
+  --dw-muted2:    #5e7a6a;
+  --dw-accent:    #34d399;
+  --dw-accent2:   #6ee7b7;
+  --dw-accent-fg: #000000;
+}
+
+/* ── SUNSET (amber-rose warm) ── */
+[data-theme="sunset"] {
+  --dw-bg:        #0e0805;
+  --dw-surface:   #160e08;
+  --dw-card:      #1e1208;
+  --dw-border:    #2e1c0e;
+  --dw-border2:   #3e2614;
+  --dw-text:      #f5ede4;
+  --dw-muted:     #5c3e28;
+  --dw-muted2:    #8a6040;
+  --dw-accent:    #fb923c;
+  --dw-accent2:   #fbbf24;
+  --dw-accent-fg: #000000;
+}
+
+/* ── MIDNIGHT (pure black, violet) ── */
+[data-theme="midnight"] {
+  --dw-bg:        #000000;
+  --dw-surface:   #080808;
+  --dw-card:      #0f0f0f;
+  --dw-border:    #1a1a1a;
+  --dw-border2:   #252525;
+  --dw-text:      #f0f0f5;
+  --dw-muted:     #404040;
+  --dw-muted2:    #606060;
+  --dw-accent:    #a78bfa;
+  --dw-accent2:   #c4b5fd;
+  --dw-accent-fg: #000000;
+}
+
+/* ── SAKURA (pink-rose light) ── */
+[data-theme="sakura"] {
+  --dw-bg:        #fdf6f8;
+  --dw-surface:   #fff0f3;
+  --dw-card:      #ffffff;
+  --dw-border:    #f5d0d8;
+  --dw-border2:   #f0b8c4;
+  --dw-text:      #2d1820;
+  --dw-muted:     #c4869a;
+  --dw-muted2:    #a06478;
+  --dw-accent:    #e11d6a;
+  --dw-accent2:   #f43f8e;
+  --dw-accent-fg: #ffffff;
+}
+
+/* ── PAPER (off-white editorial light) ── */
+[data-theme="paper"] {
+  --dw-bg:        #f7f4ef;
+  --dw-surface:   #ede9e2;
+  --dw-card:      #ffffff;
+  --dw-border:    #ddd8cf;
+  --dw-border2:   #ccc6ba;
+  --dw-text:      #1a1815;
+  --dw-muted:     #9a9288;
+  --dw-muted2:    #7a7268;
+  --dw-accent:    #c2410c;
+  --dw-accent2:   #ea580c;
+  --dw-accent-fg: #ffffff;
+}

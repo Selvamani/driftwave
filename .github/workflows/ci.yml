@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Python (indexer + api) ──────────────────────────
+  python:
+    name: Python Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install indexer deps
+        run: pip install -r indexer/requirements.txt
+
+      - name: Lint indexer
+        run: cd indexer && python -m ruff check .
+
+      - name: Install api deps
+        run: pip install -r api/requirements.txt
+
+      - name: Lint api
+        run: cd api && python -m ruff check .
+
+      - name: Test api
+        run: cd api && python -m pytest tests/ -v --tb=short
+        continue-on-error: true
+
+  # ── Frontend ────────────────────────────────────────
+  frontend:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: cd frontend && npm ci
+
+      - name: Lint
+        run: cd frontend && npm run lint
+        continue-on-error: true
+
+      - name: Build
+        run: cd frontend && npm run build
+        env:
+          VITE_API_URL: http://localhost:8000
+          VITE_NAVIDROME_URL: http://localhost:4533
+
+  # ── Flutter ─────────────────────────────────────────
+  flutter:
+    name: Flutter Analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.x"
+          channel: stable
+
+      - name: Get packages
+        run: cd mobile && flutter pub get
+
+      - name: Analyze
+        run: cd mobile && flutter analyze
+        continue-on-error: true
