@@ -36,12 +36,14 @@ export default function Layout() {
       }}>
         {/* Brand */}
         <div style={{ padding: "0 20px 24px", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 8,
-            background: "linear-gradient(135deg, var(--dw-accent), var(--dw-accent2))",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 16, boxShadow: "0 0 16px color-mix(in srgb, var(--dw-accent) 30%, transparent)",
-          }}>〜</div>
+          <img
+            src="/favicon.svg"
+            alt="Driftwave"
+            style={{
+              width: 32, height: 32, borderRadius: 8,
+              boxShadow: "0 0 16px color-mix(in srgb, var(--dw-accent) 30%, transparent)",
+            }}
+          />
           <span style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontSize: 20, fontWeight: 600, color: "var(--dw-text)",
