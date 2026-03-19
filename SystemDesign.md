@@ -1,6 +1,6 @@
 # Driftwave — System Design
 
-> v1.1 — updated to reflect all implemented changes
+> v1.2 — updated to reflect all implemented changes + next steps
 
 ---
 
@@ -385,3 +385,39 @@ Six themes ship for web and mobile: `ocean` · `aurora` · `sunset` · `midnight
 1. Add field to `TAG_EXTRACTION_PROMPT` in `api/core/retriever.py`
 2. Add handler in `build_filters()` (MatchText / MatchAny / Range as appropriate)
 3. Add Qdrant payload index in `_ensure_indexes()` in `indexer/embedder.py`
+
+---
+
+## 10 — Next Steps
+
+### Bugs / Correctness
+
+| Issue | Impact | Notes |
+|---|---|---|
+| **Year filter returns 0 results** ("before 2000", "after 2000") | High | `year` stored as string; range filter may need int cast or MatchAny expansion |
+| **Tamil tracks in Roman script misdetected as English** | High | Raattinam and similar albums; fasttext lid.176 struggles with romanised Tamil. Add artist-DB or folder-hint pass before fasttext |
+| **Audio features unreliable** | Medium | librosa energy=1.0 on ballads, repeated tempo values. Consider replacing with Essentia or Madmom for BPM, or post-processing to clamp outliers |
+| **Tamil genre always "melody"** | Medium | Downstream of audio features bug; kuthu/gaana not detected without valid energy/tempo |
+| **CLAP dual-search not wired** | Medium | `AUDIO_COLLECTION` exists in Qdrant but `api/core/retriever.py` only queries text collection. Wire parallel CLAP search and merge scores |
+| **AcoustID not wired** | Low | `pyacoustid` in requirements, fingerprinting code present in indexer but not invoked in the main pipeline |
+
+### Features
+
+| Feature | Notes |
+|---|---|
+| **Playlist push to Navidrome** | `/playlist/push` endpoint exists; web UI has no "Save playlist" button yet |
+| **Offline mode / PWA** | Service worker + cache for web; already works offline in Tauri desktop |
+| **MusicBrainz enrichment** | Wire AcoustID → MusicBrainz lookup for untagged files (MBID, release year, genre) |
+| **Malayalam / Japanese adapters** | Registered in adapter table but implementation depth varies — verify enrich() coverage |
+| **Lyrics sync (LRC timestamps)** | Lyrics are fetched but displayed as plain text; add scrolling karaoke-style display |
+| **Re-index single track** | Watch mode re-indexes new files; add API endpoint to force re-index a specific path |
+| **Android / iOS build pipeline** | Flutter code complete; CI pipeline and signing not set up |
+| **Tauri auto-update** | Tauri updater plugin not configured; add for Windows/macOS distribution |
+
+### Performance
+
+| Area | Notes |
+|---|---|
+| **Ollama tag extraction latency** | ~1–2 s per query with Gemma2:9b; evaluate Gemma2:2b or structured output mode |
+| **CLAP indexing speed** | DCLAP processes ~5 songs/s on 4060 Ti; batch size tuning may help |
+| **Qdrant HNSW ef / m tuning** | Default params; tune for recall vs. latency tradeoff at scale (>50k tracks) |

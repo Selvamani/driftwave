@@ -109,6 +109,14 @@ const usePlayerStore = create((set, get) => ({
     set({ volume: Math.max(0, Math.min(1, val)) });
   },
 
+  // Merge Qdrant enrichment into the current track (cultural_meta, adapter_type, tempo…)
+  mergeCurrentTrackMeta(meta) {
+    set((s) => {
+      if (!s.currentTrack) return {};
+      return { currentTrack: { ...s.currentTrack, ...meta } };
+    });
+  },
+
   addToQueue(track) {
     set((s) => ({ queue: [...s.queue, track] }));
   },

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import usePlayerStore from "../hooks/usePlayerStore";
+import useDiscoverStore from "../hooks/useDiscoverStore";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -182,19 +183,24 @@ function TrackRow({ track, index, isPlaying, onPlay }) {
 }
 
 export default function DiscoverPage() {
-  const [prompt,     setPrompt]     = useState("");
-  const [activeChip, setActiveChip] = useState(null);
-  const [langFilter, setLangFilter] = useState(null);
-  const [energy,     setEnergy]     = useState(0.3);
-  const [tempo,      setTempo]      = useState(0.45);
-  const [valence,    setValence]    = useState(0.4);
-  const [energyOn,      setEnergyOn]      = useState(false);
-  const [tempoOn,       setTempoOn]       = useState(false);
-  const [valenceOn,     setValenceOn]     = useState(false);
-  const [durationOn,    setDurationOn]    = useState(false);
-  const [durationMins,  setDurationMins]  = useState(300);
-  const [filtersOpen,   setFiltersOpen]   = useState(false);
-  const [limit,         setLimit]         = useState(20);
+  const {
+    prompt,       setPrompt,
+    activeChip,   setActiveChip,
+    langFilter,   setLangFilter,
+    energy,       setEnergy,
+    tempo,        setTempo,
+    valence,      setValence,
+    energyOn,     setEnergyOn,
+    tempoOn,      setTempoOn,
+    valenceOn,    setValenceOn,
+    durationOn,   setDurationOn,
+    durationMins, setDurationMins,
+    filtersOpen,  setFiltersOpen,
+    limit,        setLimit,
+    tracks:       storedTracks,
+    totalDurSec:  storedTotalDur,
+    setResults,
+  } = useDiscoverStore();
 
   const playTrack    = usePlayerStore((s) => s.playTrack);
   const currentTrack = usePlayerStore((s) => s.currentTrack);
@@ -208,7 +214,7 @@ export default function DiscoverPage() {
     };
   }
 
-  const { mutate: search, data, isPending } = useMutation({
+  const { mutate: search, isPending } = useMutation({
     mutationFn: async ({ q, lang }) => {
       const res = await axios.post(`${API}/search`, {
         prompt:               q,
@@ -220,6 +226,9 @@ export default function DiscoverPage() {
         duration_limit_secs:  durationOn ? durationMins * 60 : null,
       });
       return { tracks: res.data.tracks, total_duration: res.data.total_duration };
+    },
+    onSuccess: (data) => {
+      setResults(data.tracks ?? [], data.total_duration ?? 0);
     },
   });
 
@@ -247,8 +256,8 @@ export default function DiscoverPage() {
     if (q) search({ q, lang: next });
   };
 
-  const tracks      = data?.tracks ?? [];
-  const totalDurSec = data?.total_duration ?? 0;
+  const tracks      = storedTracks;
+  const totalDurSec = storedTotalDur;
 
   const pushToNavidrome = async () => {
     if (!tracks.length) return;
@@ -497,7 +506,7 @@ export default function DiscoverPage() {
       </div>
 
       {/* Results */}
-      {(data || isPending) && (
+      {(tracks.length > 0 || isPending) && (
         <>
           <div style={{
             display: "flex", alignItems: "center",

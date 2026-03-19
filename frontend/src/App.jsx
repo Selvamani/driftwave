@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
-import DiscoverPage from "./pages/DiscoverPage";
-import LibraryPage  from "./pages/LibraryPage";
-import PlaylistsPage from "./pages/PlaylistsPage";
-import SettingsPage  from "./pages/SettingsPage";
+import DiscoverPage    from "./pages/DiscoverPage";
+import LibraryPage     from "./pages/LibraryPage";
+import PlaylistsPage   from "./pages/PlaylistsPage";
+import SettingsPage    from "./pages/SettingsPage";
+import NowPlayingPage  from "./pages/NowPlayingPage";
 import usePlayerStore from "./hooks/usePlayerStore";
 
 function AudioEngine() {
@@ -68,10 +69,11 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/discover" replace />} />
-          <Route path="discover"  element={<DiscoverPage />} />
-          <Route path="library"   element={<LibraryPage />} />
-          <Route path="playlists" element={<PlaylistsPage />} />
-          <Route path="settings"  element={<SettingsPage />} />
+          <Route path="discover"    element={<DiscoverPage />} />
+          <Route path="library"     element={<LibraryPage />} />
+          <Route path="playlists"   element={<PlaylistsPage />} />
+          <Route path="settings"    element={<SettingsPage />} />
+          <Route path="now-playing" element={<NowPlayingPage />} />
         </Route>
       </Routes>
     </>

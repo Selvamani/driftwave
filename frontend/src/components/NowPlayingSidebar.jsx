@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import usePlayerStore from "../hooks/usePlayerStore";
 
@@ -23,13 +24,27 @@ function PlayingIndicator() {
 }
 
 export default function NowPlayingSidebar() {
+  const navigate = useNavigate();
   const { currentTrack, queue, queueIndex, isPlaying, progress, duration,
           togglePlay, next, prev, seek, shuffle, repeat,
-          toggleShuffle, cycleRepeat, playQueue } = usePlayerStore();
+          toggleShuffle, cycleRepeat, playQueue, mergeCurrentTrackMeta } = usePlayerStore();
 
   const [tab, setTab]       = useState("queue");  // "queue" | "lyrics"
   const [lyrics, setLyrics] = useState(null);     // null=loading, ""=none, str=found
   const [lyricsSource, setLyricsSource] = useState("");
+  const currentRowRef = useRef(null);
+
+  // Fetch Qdrant enrichment (cultural_meta, composer, lyricist, film info…)
+  // whenever track changes and the data isn't already present
+  useEffect(() => {
+    if (!currentTrack?.subsonic_id) return;
+    if (currentTrack.cultural_meta !== undefined) return; // already enriched
+    axios.get(`${API}/library/track-meta`, {
+      params: { subsonic_id: currentTrack.subsonic_id },
+    }).then((r) => {
+      if (r.data.found) mergeCurrentTrackMeta(r.data);
+    }).catch(() => {});
+  }, [currentTrack?.subsonic_id]);
 
   // Fetch lyrics whenever current track changes
   useEffect(() => {
@@ -50,7 +65,13 @@ export default function NowPlayingSidebar() {
       .catch(() => { setLyrics(""); });
   }, [currentTrack?.file_path]);
 
-  const upNext = queue.slice(queueIndex + 1, queueIndex + 6);
+  // Scroll current track into view when queue tab is shown or track changes
+  useEffect(() => {
+    if (tab === "queue" && currentRowRef.current) {
+      currentRowRef.current.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+  }, [tab, queueIndex]);
+
 
   return (
     <aside style={{
@@ -64,25 +85,42 @@ export default function NowPlayingSidebar() {
     }}>
       {/* Album art */}
       <div style={{ padding: "24px 24px 0" }}>
-        <div style={{
-          width: "100%", aspectRatio: 1,
-          borderRadius: 16,
-          background:   currentTrack
-            ? "linear-gradient(135deg, var(--dw-border2), var(--dw-card))"
-            : "var(--dw-card)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 72, overflow: "hidden", position: "relative",
-          boxShadow: currentTrack
-            ? "0 16px 48px color-mix(in srgb, var(--dw-accent) 15%, transparent)"
-            : "none",
-          transition: "box-shadow 0.4s",
-        }}>
+        <div
+          onClick={() => currentTrack && navigate("/now-playing")}
+          style={{
+            width: "100%", aspectRatio: 1,
+            borderRadius: 16,
+            background:   currentTrack
+              ? "linear-gradient(135deg, var(--dw-border2), var(--dw-card))"
+              : "var(--dw-card)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 72, overflow: "hidden", position: "relative",
+            boxShadow: currentTrack
+              ? "0 16px 48px color-mix(in srgb, var(--dw-accent) 15%, transparent)"
+              : "none",
+            transition: "box-shadow 0.4s",
+            cursor: currentTrack ? "pointer" : "default",
+          }}
+        >
           {currentTrack?.cover_url ? (
             <img src={currentTrack.cover_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : currentTrack ? (
             <span style={{ fontSize: 72 }}>🎵</span>
           ) : (
             <span style={{ color: "var(--dw-muted)", fontSize: 40 }}>〜</span>
+          )}
+          {/* Expand button */}
+          {currentTrack && (
+            <div style={{
+              position: "absolute", top: 8, right: 8,
+              background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)",
+              borderRadius: 6, padding: "3px 6px",
+              fontFamily: "'DM Mono', monospace", fontSize: 9,
+              color: "rgba(255,255,255,0.8)", letterSpacing: 1,
+              pointerEvents: "none",
+            }}>
+              ⤢ expand
+            </div>
           )}
         </div>
       </div>
@@ -100,10 +138,25 @@ export default function NowPlayingSidebar() {
             </div>
             <div style={{
               fontFamily: "'DM Mono', monospace", fontSize: 9,
-              color: "var(--dw-muted2)", letterSpacing: 1, marginBottom: 10,
+              color: "var(--dw-muted2)", letterSpacing: 1,
+              marginBottom: currentTrack.cultural_meta?.lyricist ? 4 : 10,
             }}>
               {currentTrack.artist?.toUpperCase()}
             </div>
+            {(currentTrack.cultural_meta?.composer || currentTrack.cultural_meta?.lyricist) && (
+              <div style={{
+                fontFamily: "'DM Mono', monospace", fontSize: 9,
+                color: "var(--dw-muted)", letterSpacing: 1, marginBottom: 10,
+                display: "flex", flexDirection: "column", gap: 2,
+              }}>
+                {currentTrack.cultural_meta.composer && (
+                  <span>🎼 {currentTrack.cultural_meta.composer}</span>
+                )}
+                {currentTrack.cultural_meta.lyricist && (
+                  <span>✍ {currentTrack.cultural_meta.lyricist}</span>
+                )}
+              </div>
+            )}
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               <LangBadge lang={currentTrack.adapter_type} />
               {currentTrack.cultural_meta?.tamil_genre && (
@@ -113,10 +166,57 @@ export default function NowPlayingSidebar() {
               )}
               {currentTrack.tempo > 0 && (
                 <span className="lang-badge" style={{ color: "var(--dw-muted2)", borderColor: "var(--dw-border2)" }}>
-                  {Math.round(currentTrack.tempo)} BPM
+                  {Math.round(currentTrack.tempo)} kbps
                 </span>
               )}
             </div>
+
+            {/* Film info */}
+            {currentTrack.cultural_meta?.film_name && (
+              <div style={{
+                marginTop: 14,
+                background: "var(--dw-card)",
+                border: "1px solid var(--dw-border)",
+                borderRadius: 10, padding: "10px 12px",
+              }}>
+                <div style={{
+                  fontFamily: "'DM Mono', monospace", fontSize: 8,
+                  letterSpacing: 2, color: "var(--dw-muted)",
+                  textTransform: "uppercase", marginBottom: 6,
+                }}>
+                  🎬 {currentTrack.cultural_meta.film_name}
+                </div>
+                {currentTrack.cultural_meta.film_meta?.director && (
+                  <div style={{ fontSize: 11, color: "var(--dw-muted2)", marginBottom: 3 }}>
+                    <span style={{ color: "var(--dw-muted)", fontSize: 9 }}>Dir. </span>
+                    {currentTrack.cultural_meta.film_meta.director}
+                  </div>
+                )}
+                {currentTrack.cultural_meta.film_meta?.cast?.length > 0 && (
+                  <div style={{
+                    fontSize: 10, color: "var(--dw-muted)",
+                    lineHeight: 1.6, marginBottom: 4,
+                  }}>
+                    {currentTrack.cultural_meta.film_meta.cast.slice(0, 4).join(" · ")}
+                  </div>
+                )}
+                {currentTrack.cultural_meta.film_meta?.imdb_url && (
+                  <a
+                    href={currentTrack.cultural_meta.film_meta.imdb_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      fontFamily: "'DM Mono', monospace", fontSize: 8,
+                      color: "var(--dw-accent)", textDecoration: "none",
+                      letterSpacing: 1, display: "inline-block",
+                    }}
+                  >
+                    IMDb ↗
+                  </a>
+                )}
+              </div>
+            )}
           </>
         ) : (
           <div style={{
@@ -200,20 +300,23 @@ export default function NowPlayingSidebar() {
         display: "flex", borderTop: "1px solid var(--dw-border)",
         padding: "0 16px",
       }}>
-        {["queue", "lyrics"].map((t) => (
+        {[
+          { id: "queue",  label: `Playlist${queue.length ? ` · ${queue.length}` : ""}` },
+          { id: "lyrics", label: "Lyrics" },
+        ].map(({ id, label }) => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
+            key={id}
+            onClick={() => setTab(id)}
             style={{
               flex: 1, padding: "10px 0",
               background: "none", border: "none",
-              borderBottom: `2px solid ${tab === t ? "var(--dw-accent)" : "transparent"}`,
-              color: tab === t ? "var(--dw-accent)" : "var(--dw-muted)",
+              borderBottom: `2px solid ${tab === id ? "var(--dw-accent)" : "transparent"}`,
+              color: tab === id ? "var(--dw-accent)" : "var(--dw-muted)",
               fontFamily: "'DM Mono', monospace", fontSize: 9,
               letterSpacing: 2, textTransform: "uppercase",
               cursor: "pointer", transition: "all 0.15s",
             }}
-          >{t}</button>
+          >{label}</button>
         ))}
       </div>
 
@@ -222,41 +325,70 @@ export default function NowPlayingSidebar() {
 
         {tab === "queue" && (
           <>
-            {upNext.length === 0 && (
-              <div style={{ color: "var(--dw-muted)", fontSize: 12, padding: "8px 4px" }}>
-                Queue empty
+            {queue.length === 0 ? (
+              <div style={{ color: "var(--dw-muted)", fontSize: 12, padding: "8px 4px", fontStyle: "italic" }}>
+                Queue empty — search or browse to add tracks
               </div>
-            )}
-            {upNext.map((track, i) => (
-              <div
-                key={i}
-                onClick={() => playQueue(queue, queueIndex + 1 + i)}
-                style={{
-                  display: "flex", gap: 10, alignItems: "center",
-                  padding: "7px 8px", borderRadius: 8, cursor: "pointer",
-                  transition: "background 0.15s",
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = "var(--dw-card)"}
-                onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
-              >
+            ) : (
+              <>
                 <div style={{
-                  width: 30, height: 30, borderRadius: 6,
-                  background: "var(--dw-card)", border: "1px solid var(--dw-border)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 14, flexShrink: 0,
-                }}>🎵</div>
-                <div style={{ flex: 1, overflow: "hidden" }}>
-                  <div style={{
-                    fontSize: 11, fontWeight: 600, color: "var(--dw-text)",
-                    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                  }}>{track.title}</div>
-                  <div style={{
-                    fontFamily: "'DM Mono', monospace", fontSize: 8,
-                    color: "var(--dw-muted)",
-                  }}>{track.artist}</div>
+                  fontFamily: "'DM Mono', monospace", fontSize: 8,
+                  letterSpacing: 2, color: "var(--dw-muted)", textTransform: "uppercase",
+                  marginBottom: 8, padding: "0 4px",
+                }}>
+                  {queue.length} track{queue.length !== 1 ? "s" : ""}
                 </div>
-              </div>
-            ))}
+                {queue.map((track, i) => {
+                  const isCurrent = i === queueIndex;
+                  const isPast    = i < queueIndex;
+                  return (
+                    <div
+                      key={i}
+                      ref={isCurrent ? currentRowRef : null}
+                      onClick={() => playQueue(queue, i)}
+                      style={{
+                        display: "flex", gap: 10, alignItems: "center",
+                        padding: "7px 8px", borderRadius: 8, cursor: "pointer",
+                        background: isCurrent ? "color-mix(in srgb, var(--dw-accent) 10%, transparent)" : "transparent",
+                        border: isCurrent ? "1px solid color-mix(in srgb, var(--dw-accent) 25%, transparent)" : "1px solid transparent",
+                        opacity: isPast ? 0.45 : 1,
+                        transition: "background 0.15s",
+                      }}
+                      onMouseEnter={(e) => { if (!isCurrent) e.currentTarget.style.background = "var(--dw-card)"; }}
+                      onMouseLeave={(e) => { if (!isCurrent) e.currentTarget.style.background = "transparent"; }}
+                    >
+                      <div style={{
+                        width: 22, textAlign: "right", flexShrink: 0,
+                        fontFamily: "'DM Mono', monospace", fontSize: 9,
+                        color: "var(--dw-muted)",
+                      }}>
+                        {isCurrent && isPlaying ? <PlayingIndicator /> : i + 1}
+                      </div>
+                      <div style={{ flex: 1, overflow: "hidden" }}>
+                        <div style={{
+                          fontSize: 11, fontWeight: isCurrent ? 700 : 600,
+                          color: isCurrent ? "var(--dw-accent)" : "var(--dw-text)",
+                          whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                        }}>{track.title}</div>
+                        <div style={{
+                          fontFamily: "'DM Mono', monospace", fontSize: 8,
+                          color: "var(--dw-muted)",
+                          whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                        }}>{track.artist}</div>
+                      </div>
+                      {track.duration > 0 && (
+                        <div style={{
+                          fontFamily: "'DM Mono', monospace", fontSize: 8,
+                          color: "var(--dw-muted)", flexShrink: 0,
+                        }}>
+                          {formatTime(track.duration)}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </>
         )}
 

@@ -14,16 +14,18 @@ driftwave/
 │   ├── routes/     # API endpoints
 │   ├── core/       # RAG, retriever, Navidrome client
 │   └── tests/
-├── frontend/       # React + Vite — web playlist builder
-│   └── src/
-│       ├── themes/ # 6 color themes (ocean, aurora, sunset, midnight, sakura, paper)
-│       ├── pages/  # Discover, Library, Playlists
-│       └── services/
+├── frontend/       # React + Vite — web playlist builder + Tauri desktop wrapper
+│   ├── src/
+│   │   ├── themes/   # 6 color themes (ocean, aurora, sunset, midnight, sakura, paper)
+│   │   ├── pages/    # Discover, Library, Playlists, NowPlaying, Settings, Setup
+│   │   ├── hooks/    # usePlayerStore (Zustand), useDiscoverStore (Zustand, persistent)
+│   │   └── services/ # config.js — runtime server URL via localStorage
+│   └── src-tauri/  # Tauri v2 desktop wrapper (Rust scaffold + capabilities)
 ├── mobile/         # Flutter — iOS + Android client
 │   └── lib/
 │       ├── themes/
-│       ├── features/ # Auth, Discover, Library, Player
-│       └── services/ # API + Subsonic clients
+│       ├── features/ # Auth, Discover, Library, Player, Settings
+│       └── services/ # API + Subsonic clients (fetchTrackMeta for Qdrant enrichment)
 ├── docker-compose.yml
 └── Makefile
 ```
@@ -107,6 +109,36 @@ cd mobile && dart analyze
 ## Adding a Language Adapter
 
 Implement `BaseAdapter` in `indexer/adapters/` and register it in the adapter registry. Each adapter handles language detection, composer/artist enrichment, and genre tagging for its cultural domain.
+
+## Tauri Desktop
+
+The frontend can run as a native desktop app (Windows / macOS / Linux) via Tauri v2.
+
+- Entry point: `frontend/src-tauri/`
+- Dev: `cd frontend && npm run tauri:dev`
+- Build: `cd frontend && npm run tauri:build`
+- On first launch (no localStorage URL set), app shows `SetupPage` to configure API + Navidrome URLs
+- Runtime URL config stored in `localStorage` keys `dw_api_url` / `dw_navidrome_url`
+- `isTauri()` in `services/config.js` detects `__TAURI_INTERNALS__` in window
+- Windows build requires: Rust (rustup), VS Build Tools (C++ workload), Node.js
+
+## Library Track Enrichment
+
+Navidrome's Subsonic API does not return Qdrant-enriched fields (composer, lyricist, film info, audio features). These are fetched separately:
+
+- **Endpoint**: `GET /library/track-meta?subsonic_id=<id>`
+- **Returns**: `cultural_meta` (composer, lyricist, film_meta), `adapter_type`, `tempo`, `energy`, `valence`
+- **Web**: auto-fetched in `NowPlayingSidebar` on track change (skips if already present)
+- **Flutter**: auto-fetched in `PlayerNotifier._fetchEnrichment()` on `playTrack`/`next`
+- Use `mergeCurrentTrackMeta()` (web Zustand) / `mergeTrackMeta()` (Flutter Riverpod) to patch enrichment into the current track state
+
+## Discover Page State
+
+Discover page state (prompt, filters, results) is stored in `useDiscoverStore` (Zustand) — not local `useState`. This preserves state when navigating away and back. Do not revert to local state.
+
+## Subsonic API Key Normalization
+
+Navidrome's `search3` response returns singular keys (`artist`, `album`, `song`). The `/library/search` route normalises these to plural (`artists`, `albums`, `songs`) before returning to the frontend. Both web and Flutter expect plural keys.
 
 ## Themes
 

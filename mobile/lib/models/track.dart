@@ -18,6 +18,7 @@ class Track {
   final String lyrics;
   final Map<String, dynamic> culturalMeta;
   final double score;
+  final String coverUrl;
 
   const Track({
     required this.filePath,
@@ -39,6 +40,7 @@ class Track {
     this.lyrics      = '',
     this.culturalMeta = const {},
     this.score       = 0,
+    this.coverUrl    = '',
   });
 
   factory Track.fromJson(Map<String, dynamic> j) => Track(
@@ -61,6 +63,37 @@ class Track {
     lyrics:       j['lyrics']       ?? '',
     culturalMeta: Map<String, dynamic>.from(j['cultural_meta'] ?? {}),
     score:        (j['score']       ?? 0).toDouble(),
+    coverUrl:     j['cover_url']    ?? '',
+  );
+
+  Track copyWith({
+    String? adapterType,
+    double? tempo,
+    double? energy,
+    double? valence,
+    Map<String, dynamic>? culturalMeta,
+    String? coverUrl,
+  }) => Track(
+    filePath:     filePath,
+    subsonicId:   subsonicId,
+    mbid:         mbid,
+    title:        title,
+    artist:       artist,
+    album:        album,
+    year:         year,
+    genre:        genre,
+    duration:     duration,
+    tempo:        tempo       ?? this.tempo,
+    energy:       energy      ?? this.energy,
+    valence:      valence     ?? this.valence,
+    key:          key,
+    adapterType:  adapterType ?? this.adapterType,
+    language:     language,
+    description:  description,
+    lyrics:       lyrics,
+    culturalMeta: culturalMeta ?? this.culturalMeta,
+    score:        score,
+    coverUrl:     coverUrl    ?? this.coverUrl,
   );
 
   String get durationFormatted {
@@ -69,7 +102,17 @@ class Track {
     return '$m:${s.toString().padLeft(2, '0')}';
   }
 
-  String get composer => culturalMeta['composer'] as String? ?? '';
-  String get filmName  => culturalMeta['film_name'] as String? ?? '';
+  // cultural_meta convenience getters
+  String get composer    => culturalMeta['composer']    as String? ?? '';
+  String get lyricist    => culturalMeta['lyricist']    as String? ?? '';
+  String get filmName    => culturalMeta['film_name']   as String? ?? '';
   String get tamileGenre => culturalMeta['tamil_genre'] as String? ?? '';
+
+  Map<String, dynamic> get filmMeta =>
+      (culturalMeta['film_meta'] as Map?)?.cast<String, dynamic>() ?? {};
+
+  String       get filmDirector => filmMeta['director'] as String? ?? '';
+  List<String> get filmCast     =>
+      (filmMeta['cast'] as List?)?.map((e) => e.toString()).toList() ?? [];
+  String       get imdbUrl      => filmMeta['imdb_url'] as String? ?? '';
 }

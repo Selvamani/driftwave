@@ -11,7 +11,7 @@ class AppShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final c           = ref.watch(themeColorsProvider);
+    final c            = ref.watch(themeColorsProvider);
     final currentTrack = ref.watch(playerProvider).currentTrack;
 
     return Scaffold(
@@ -19,9 +19,7 @@ class AppShell extends ConsumerWidget {
       body: Column(
         children: [
           Expanded(child: shell),
-          // Mini player — shown when a track is loaded
           if (currentTrack != null) const MiniPlayer(),
-          // Bottom navigation
           NavigationBar(
             backgroundColor:  c.surface,
             indicatorColor:   c.accent.withOpacity(0.12),
@@ -32,9 +30,10 @@ class AppShell extends ConsumerWidget {
             ),
             destinations: [
               NavigationDestination(
-                icon:          const Text('✨', style: TextStyle(fontSize: 20)),
-                selectedIcon:  Text('✨', style: TextStyle(fontSize: 20, shadows: [Shadow(color: Color(0xFF38BDF8), blurRadius: 8)])),
-                label:         'Drift',
+                icon:         const Text('✨', style: TextStyle(fontSize: 20)),
+                selectedIcon: Text('✨', style: TextStyle(fontSize: 20,
+                    shadows: [Shadow(color: Color(0xFF38BDF8), blurRadius: 8)])),
+                label: 'Drift',
               ),
               const NavigationDestination(
                 icon:  Text('🎵', style: TextStyle(fontSize: 20)),
@@ -43,6 +42,10 @@ class AppShell extends ConsumerWidget {
               const NavigationDestination(
                 icon:  Text('📋', style: TextStyle(fontSize: 20)),
                 label: 'Playlists',
+              ),
+              const NavigationDestination(
+                icon:  Text('⚙️', style: TextStyle(fontSize: 20)),
+                label: 'Settings',
               ),
             ],
           ),

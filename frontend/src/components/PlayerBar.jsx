@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import usePlayerStore from "../hooks/usePlayerStore";
 
 export default function PlayerBar() {
+  const navigate = useNavigate();
   const { currentTrack, isPlaying, progress, duration, volume,
           togglePlay, next, prev, seek, setVolume } = usePlayerStore();
 
@@ -17,8 +19,18 @@ export default function PlayerBar() {
       justifyContent: "space-between",
       gap:          24,
     }}>
-      {/* Track info */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
+      {/* Track info — click to open Now Playing page */}
+      <div
+        onClick={() => currentTrack && navigate("/now-playing")}
+        style={{
+          display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0,
+          cursor: currentTrack ? "pointer" : "default",
+          borderRadius: 8, padding: "4px 6px", margin: "-4px -6px",
+          transition: "background 0.15s",
+        }}
+        onMouseEnter={(e) => { if (currentTrack) e.currentTarget.style.background = "var(--dw-card)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+      >
         <div style={{
           width: 46, height: 46, borderRadius: 8, flexShrink: 0,
           background: "var(--dw-card)", border: "1px solid var(--dw-border)",

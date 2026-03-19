@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/track.dart';
 
-const _kServerKey = 'dw_server_url';
+const kServerKey    = 'dw_server_url';
+const kNavidromeKey = 'dw_navidrome_url';
+// keep old name as alias so existing code still compiles
+const _kServerKey   = kServerKey;
 
 class DriftwaveApiService {
   final Dio _dio;
@@ -17,6 +20,13 @@ class DriftwaveApiService {
         ));
 
   // ── Search ────────────────────────────────────────────
+
+  Track _withCover(Track t) {
+    if (t.coverUrl.isEmpty && t.subsonicId.isNotEmpty) {
+      return t.copyWith(coverUrl: '$baseUrl/stream/cover/${t.subsonicId}');
+    }
+    return t;
+  }
 
   Future<List<Track>> search({
     required String prompt,
@@ -33,7 +43,9 @@ class DriftwaveApiService {
       'clap_weight': clapWeight,
     });
     final tracks = r.data['tracks'] as List;
-    return tracks.map((t) => Track.fromJson(t as Map<String, dynamic>)).toList();
+    return tracks
+        .map((t) => _withCover(Track.fromJson(t as Map<String, dynamic>)))
+        .toList();
   }
 
   // ── Playlists ─────────────────────────────────────────
@@ -67,6 +79,14 @@ class DriftwaveApiService {
 
   Future<Map<String, dynamic>> searchLibrary(String q) async {
     final r = await _dio.get('/library/search', queryParameters: {'q': q});
+    return r.data as Map<String, dynamic>;
+  }
+
+  // ── Track metadata (Qdrant enrichment) ───────────────
+
+  Future<Map<String, dynamic>> fetchTrackMeta(String subsonicId) async {
+    final r = await _dio.get('/library/track-meta',
+        queryParameters: {'subsonic_id': subsonicId});
     return r.data as Map<String, dynamic>;
   }
 

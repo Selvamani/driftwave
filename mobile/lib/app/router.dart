@@ -6,6 +6,7 @@ import '../features/discover/discover_screen.dart';
 import '../features/library/library_screen.dart';
 import '../features/player/player_screen.dart';
 import '../features/playlists/playlists_screen.dart';
+import '../features/settings/settings_screen.dart';
 import 'shell.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -13,7 +14,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/discover',
     routes: [
       GoRoute(
-        path: '/setup',
+        path:    '/setup',
         builder: (ctx, state) => const SetupScreen(),
       ),
       StatefulShellRoute.indexedStack(
@@ -21,26 +22,32 @@ final routerProvider = Provider<GoRouter>((ref) {
         branches: [
           StatefulShellBranch(routes: [
             GoRoute(
-              path: '/discover',
+              path:    '/discover',
               builder: (ctx, state) => const DiscoverScreen(),
             ),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
-              path: '/library',
+              path:    '/library',
               builder: (ctx, state) => const LibraryScreen(),
             ),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
-              path: '/playlists',
+              path:    '/playlists',
               builder: (ctx, state) => const PlaylistsScreen(),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path:    '/settings',
+              builder: (ctx, state) => const SettingsScreen(),
             ),
           ]),
         ],
       ),
       GoRoute(
-        path: '/player',
+        path:    '/player',
         builder: (ctx, state) => const PlayerScreen(),
       ),
     ],

@@ -3,28 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Driftwave — System Design</title>
+<title>Driftwave — System Design v1.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@400;500;700&display=swap');
 
 :root {
-  --bg:       #05080f;
-  --surface:  #0c1018;
-  --card:     #101520;
-  --border:   #1a2030;
-  --border2:  #222d40;
+  --bg:      #05080f;
+  --surface: #0c1018;
+  --card:    #0f1420;
+  --border:  #1a2030;
+  --border2: #243048;
+  --dim:     #080c14;
 
-  --wave1:  #0ea5e9;   /* sky blue  — core brand */
-  --wave2:  #6366f1;   /* indigo    — AI/vector */
-  --wave3:  #f97316;   /* orange    — indexer */
-  --wave4:  #10b981;   /* emerald   — navidrome */
-  --wave5:  #f43f5e;   /* rose      — mobile */
-  --wave6:  #fbbf24;   /* amber     — web */
-  --wave7:  #a78bfa;   /* violet    — adapters */
+  --wave1: #0ea5e9;  /* sky      — API/core */
+  --wave2: #6366f1;  /* indigo   — AI/vector */
+  --wave3: #f97316;  /* orange   — indexer */
+  --wave4: #10b981;  /* emerald  — navidrome */
+  --wave5: #f43f5e;  /* rose     — mobile */
+  --wave6: #fbbf24;  /* amber    — web */
+  --wave7: #a78bfa;  /* violet   — adapters */
+  --wave8: #34d399;  /* teal     — new features */
 
-  --text:   #e2e8f0;
-  --muted:  #4a5568;
-  --dim:    #0a0e18;
+  --text:  #e2e8f0;
+  --muted: #4a5568;
+  --dim2:  #0a0e18;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,21 +34,20 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Cabinet Grotesk', sans-serif;
-  min-height: 100vh;
-  padding: 0 0 80px;
-  overflow-x: hidden;
+  font-family: 'Cabinet Grotesk', system-ui, sans-serif;
+  padding: 0 0 100px;
+  width: 1560px;
+  margin: 0 auto;
 }
 
-/* animated wave background */
 body::before {
-  content: '';
+  content:'';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 40% at 10% 20%, rgba(14,165,233,0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 30% at 90% 80%, rgba(99,102,241,0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(16,185,129,0.02) 0%, transparent 70%);
+    radial-gradient(ellipse 80% 40% at 10% 10%, rgba(14,165,233,.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 30% at 90% 85%, rgba(99,102,241,.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 55% 50%, rgba(16,185,129,.02) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -54,283 +55,160 @@ body::before {
 /* ── HEADER ── */
 .header {
   padding: 52px 60px 40px;
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 24px;
+  position: relative; z-index: 1;
+  display: flex; align-items: flex-end;
+  justify-content: space-between; flex-wrap: wrap; gap: 24px;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 48px;
+  margin-bottom: 52px;
 }
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
+.brand { display: flex; align-items: center; gap: 16px; }
 .logo-mark {
-  width: 44px; height: 44px;
-  border-radius: 12px;
+  width: 48px; height: 48px; border-radius: 14px;
   background: linear-gradient(135deg, var(--wave1), var(--wave2));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  box-shadow: 0 0 24px rgba(14,165,233,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 0 30px rgba(14,165,233,.35);
 }
-
 .brand-text h1 {
   font-family: 'Clash Display', sans-serif;
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -1px;
-  color: #fff;
-  line-height: 1;
+  font-size: 34px; font-weight: 700;
+  letter-spacing: -1px; color: #fff; line-height: 1;
 }
-
 .brand-text p {
   font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-top: 4px;
+  font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--muted); margin-top: 5px;
 }
-
-.header-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
-}
-
 .legend {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
 }
-
 .leg {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  color: var(--muted);
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  display: flex; align-items: center; gap: 7px;
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--muted); letter-spacing: 1px; text-transform: uppercase;
 }
+.leg-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
 
-.leg-dot {
-  width: 6px; height: 6px;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-/* ── MAIN LAYOUT ── */
+/* ── PAGE ── */
 .page {
   padding: 0 60px;
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 36px;
 }
 
 /* ── SECTION LABEL ── */
-.section-label {
+.sec {
   font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  font-size: 9px; letter-spacing: 4px;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 14px;
 }
-.section-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
+.sec::after {
+  content:''; flex:1; height:1px; background: var(--border);
 }
 
-/* ── CARDS ── */
+/* ── CARD ── */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 24px 28px;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.25s, box-shadow 0.25s;
+  border-radius: 16px; padding: 26px 30px;
+  position: relative; overflow: hidden;
 }
-
-.card:hover { border-color: var(--border2); }
-
 .card-accent {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  border-radius: 14px 14px 0 0;
+  position: absolute; top:0; left:0; right:0;
+  height: 2px; border-radius: 16px 16px 0 0;
 }
-
 .card-title {
   font-family: 'Clash Display', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  margin-bottom: 4px;
-  letter-spacing: -0.3px;
+  font-size: 17px; font-weight: 600;
+  color: #fff; margin-bottom: 4px; letter-spacing: -.3px;
 }
-
 .card-sub {
   font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 20px;
+  font-size: 9px; letter-spacing: 2px;
+  text-transform: uppercase; margin-bottom: 22px;
 }
 
-/* ── GRID LAYOUTS ── */
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+/* grids */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+.g5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; }
 
-/* ── SERVICE ITEMS ── */
+/* ── ITEM ── */
 .items { display: flex; flex-direction: column; gap: 8px; }
-
 .item {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  padding: 10px 12px;
-  background: var(--dim);
-  border-radius: 8px;
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 10px 13px;
+  background: var(--dim); border-radius: 9px;
   border: 1px solid var(--border);
-  transition: background 0.2s, border-color 0.2s;
 }
-
-.item:hover { background: #111827; }
-
 .item-icon { font-size: 13px; line-height: 1.6; flex-shrink: 0; }
-
-.item-name {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.3;
-}
-
+.item-name { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.3; }
 .item-desc {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  color: var(--muted);
-  margin-top: 2px;
-  line-height: 1.6;
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--muted); margin-top: 2px; line-height: 1.6;
 }
 
 /* ── TAGS ── */
 .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
-
 .tag {
-  font-family: 'DM Mono', monospace;
-  font-size: 8px;
-  letter-spacing: 1px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  border: 1px solid;
-  text-transform: uppercase;
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  letter-spacing: 1px; padding: 3px 8px;
+  border-radius: 4px; border: 1px solid; text-transform: uppercase;
+}
+.tag-new {
+  font-family: 'DM Mono', monospace; font-size: 7px;
+  letter-spacing: 1px; padding: 2px 6px; border-radius: 4px;
+  border: 1px solid rgba(52,211,153,.4);
+  background: rgba(52,211,153,.08);
+  color: var(--wave8); text-transform: uppercase;
+  vertical-align: middle; margin-left: 5px;
 }
 
-/* ── PIPELINE (horizontal flow) ── */
-.pipeline-flow {
-  display: flex;
-  align-items: stretch;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  gap: 0;
+/* ── PIPELINE (horizontal) ── */
+.pipeline {
+  display: flex; align-items: stretch;
+  overflow-x: auto; padding-bottom: 4px; gap: 0;
 }
-
-.pipe-node {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
+.pipe-node { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
 .pipe-box {
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: 1px solid;
-  min-width: 120px;
-  text-align: center;
-  position: relative;
+  padding: 13px 17px; border-radius: 11px;
+  border: 1px solid; min-width: 120px; text-align: center;
 }
-
-.pipe-box-name {
-  font-size: 12px;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1.2;
+.pipe-name { font-size: 12px; font-weight: 700; color: #fff; line-height: 1.2; }
+.pipe-sub {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  color: var(--muted); margin-top: 5px; line-height: 1.6;
 }
-
-.pipe-box-sub {
-  font-family: 'DM Mono', monospace;
-  font-size: 8px;
-  color: var(--muted);
-  margin-top: 5px;
-  line-height: 1.5;
+.pipe-arrow {
+  flex-shrink: 0; display: flex; align-items: center; padding: 0 3px; margin-top: -10px;
 }
-
-.pipe-connector {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  padding: 0 4px;
-  margin-top: -8px;
-}
-
-.pipe-connector-line {
-  width: 28px;
-  height: 1px;
+.pipe-arrow-line {
+  width: 30px; height: 1px;
   background: linear-gradient(90deg, var(--border2), var(--border));
   position: relative;
 }
-
-.pipe-connector-line::after {
-  content: '▶';
-  position: absolute;
-  right: -6px;
-  top: -7px;
-  font-size: 8px;
-  color: var(--border2);
+.pipe-arrow-line::after {
+  content: '▶'; position: absolute; right: -6px; top: -7px;
+  font-size: 8px; color: var(--border2);
+}
+.pipe-lbl {
+  font-family: 'DM Mono', monospace; font-size: 7px;
+  color: var(--muted); margin-top: 6px;
+  white-space: nowrap; letter-spacing: 1px;
 }
 
-.pipe-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 7px;
-  color: var(--muted);
-  margin-top: 6px;
-  white-space: nowrap;
-  letter-spacing: 1px;
-}
-
-/* color variants */
-.c-blue   { border-color: rgba(14,165,233,0.35);  background: rgba(14,165,233,0.06); }
-.c-indigo { border-color: rgba(99,102,241,0.35);   background: rgba(99,102,241,0.06); }
-.c-orange { border-color: rgba(249,115,22,0.35);   background: rgba(249,115,22,0.06); }
-.c-green  { border-color: rgba(16,185,129,0.35);   background: rgba(16,185,129,0.06); }
-.c-rose   { border-color: rgba(244,63,94,0.35);    background: rgba(244,63,94,0.06);  }
-.c-amber  { border-color: rgba(251,191,36,0.35);   background: rgba(251,191,36,0.06); }
-.c-violet { border-color: rgba(167,139,250,0.35);  background: rgba(167,139,250,0.06);}
-.c-dim    { border-color: var(--border);            background: var(--dim);            }
+/* ── color classes ── */
+.c-blue   { border-color: rgba(14,165,233,.35);  background: rgba(14,165,233,.07); }
+.c-indigo { border-color: rgba(99,102,241,.35);  background: rgba(99,102,241,.07); }
+.c-orange { border-color: rgba(249,115,22,.35);  background: rgba(249,115,22,.07); }
+.c-green  { border-color: rgba(16,185,129,.35);  background: rgba(16,185,129,.07); }
+.c-rose   { border-color: rgba(244,63,94,.35);   background: rgba(244,63,94,.07);  }
+.c-amber  { border-color: rgba(251,191,36,.35);  background: rgba(251,191,36,.07); }
+.c-violet { border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.07);}
+.c-teal   { border-color: rgba(52,211,153,.35);  background: rgba(52,211,153,.07); }
+.c-dim    { border-color: var(--border); background: var(--dim); }
 
 .acc-blue   { background: var(--wave1); }
 .acc-indigo { background: var(--wave2); }
@@ -339,17 +217,9 @@ body::before {
 .acc-rose   { background: var(--wave5); }
 .acc-amber  { background: var(--wave6); }
 .acc-violet { background: var(--wave7); }
+.acc-teal   { background: var(--wave8); }
 .acc-multi  { background: linear-gradient(90deg, var(--wave1), var(--wave2), var(--wave3), var(--wave4)); }
 
-.t-blue   { color: var(--wave1); border-color: rgba(14,165,233,0.3);  background: rgba(14,165,233,0.06);  }
-.t-indigo { color: var(--wave2); border-color: rgba(99,102,241,0.3);  background: rgba(99,102,241,0.06);  }
-.t-orange { color: var(--wave3); border-color: rgba(249,115,22,0.3);  background: rgba(249,115,22,0.06);  }
-.t-green  { color: var(--wave4); border-color: rgba(16,185,129,0.3);  background: rgba(16,185,129,0.06);  }
-.t-rose   { color: var(--wave5); border-color: rgba(244,63,94,0.3);   background: rgba(244,63,94,0.06);   }
-.t-amber  { color: var(--wave6); border-color: rgba(251,191,36,0.3);  background: rgba(251,191,36,0.06);  }
-.t-violet { color: var(--wave7); border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.06); }
-
-/* card sub colors */
 .s-blue   { color: var(--wave1); }
 .s-indigo { color: var(--wave2); }
 .s-orange { color: var(--wave3); }
@@ -357,925 +227,1001 @@ body::before {
 .s-rose   { color: var(--wave5); }
 .s-amber  { color: var(--wave6); }
 .s-violet { color: var(--wave7); }
+.s-teal   { color: var(--wave8); }
 
-/* hover glows */
-.card.blue:hover   { box-shadow: 0 8px 40px rgba(14,165,233,0.1); }
-.card.indigo:hover { box-shadow: 0 8px 40px rgba(99,102,241,0.1); }
-.card.orange:hover { box-shadow: 0 8px 40px rgba(249,115,22,0.1); }
-.card.green:hover  { box-shadow: 0 8px 40px rgba(16,185,129,0.1); }
-.card.rose:hover   { box-shadow: 0 8px 40px rgba(244,63,94,0.1);  }
-.card.amber:hover  { box-shadow: 0 8px 40px rgba(251,191,36,0.1); }
-.card.violet:hover { box-shadow: 0 8px 40px rgba(167,139,250,0.1);}
+.t-blue   { color: var(--wave1); border-color: rgba(14,165,233,.3);  background: rgba(14,165,233,.07); }
+.t-indigo { color: var(--wave2); border-color: rgba(99,102,241,.3);  background: rgba(99,102,241,.07); }
+.t-orange { color: var(--wave3); border-color: rgba(249,115,22,.3);  background: rgba(249,115,22,.07); }
+.t-green  { color: var(--wave4); border-color: rgba(16,185,129,.3);  background: rgba(16,185,129,.07); }
+.t-rose   { color: var(--wave5); border-color: rgba(244,63,94,.3);   background: rgba(244,63,94,.07);  }
+.t-amber  { color: var(--wave6); border-color: rgba(251,191,36,.3);  background: rgba(251,191,36,.07); }
+.t-violet { color: var(--wave7); border-color: rgba(167,139,250,.3); background: rgba(167,139,250,.07);}
+.t-teal   { color: var(--wave8); border-color: rgba(52,211,153,.3);  background: rgba(52,211,153,.07); }
 
-/* ── QUERY FLOW (vertical steps) ── */
+/* ── FLOW STEPS (vertical) ── */
 .flow-steps { display: flex; flex-direction: column; gap: 0; }
-
 .flow-step {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  padding: 12px 0;
-  position: relative;
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 11px 0; position: relative;
 }
-
 .flow-step:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  left: 14px;
-  top: 40px;
-  bottom: 0;
-  width: 1px;
-  background: linear-gradient(to bottom, var(--border2), transparent);
+  content:''; position: absolute; left: 13px; top: 38px; bottom: 0;
+  width: 1px; background: linear-gradient(to bottom, var(--border2), transparent);
 }
-
 .step-num {
-  width: 28px; height: 28px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  font-weight: 500;
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
   flex-shrink: 0;
 }
-
 .step-body { flex: 1; }
-
-.step-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 3px;
-}
-
+.step-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 3px; }
 .step-detail {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  color: var(--muted);
-  line-height: 1.7;
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--muted); line-height: 1.7;
 }
-
 .step-detail strong { color: #94a3b8; }
 
+/* ── DETECT CHAIN ── */
+.detect-chain { display: flex; flex-direction: column; gap: 6px; }
+.detect-step {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 13px; background: var(--dim);
+  border-radius: 8px; border: 1px solid var(--border);
+}
+.detect-num { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); width: 18px; flex-shrink: 0; }
+.detect-name { font-size: 12px; font-weight: 600; color: var(--text); flex: 1; }
+.detect-conf { font-family: 'DM Mono', monospace; font-size: 8px; padding: 2px 8px; border-radius: 4px; border: 1px solid; }
+
 /* ── ADAPTER GRID ── */
-.adapter-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
+.adapter-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
 .adapter-card {
-  padding: 14px 16px;
-  background: var(--dim);
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  transition: border-color 0.2s, background 0.2s;
+  padding: 15px 17px; background: var(--dim);
+  border-radius: 11px; border: 1px solid var(--border);
 }
-
-.adapter-card:hover { background: #0e1520; border-color: var(--border2); }
-
-.adapter-flag { font-size: 20px; margin-bottom: 8px; }
-
+.adapter-flag { font-size: 22px; margin-bottom: 9px; }
 .adapter-lang {
   font-family: 'Clash Display', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-  margin-bottom: 4px;
+  font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 5px;
 }
-
 .adapter-detail {
-  font-family: 'DM Mono', monospace;
-  font-size: 8px;
-  color: var(--muted);
-  line-height: 1.6;
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  color: var(--muted); line-height: 1.7;
 }
-
 .adapter-fallback {
-  grid-column: span 4;
-  padding: 14px 16px;
-  background: var(--dim);
-  border-radius: 10px;
+  grid-column: span 4; padding: 14px 18px;
+  background: var(--dim); border-radius: 11px;
   border: 1px dashed var(--border2);
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  display: flex; align-items: center; gap: 16px;
 }
 
-/* ── INFRA BLOCKS ── */
+/* ── INFRA BLOCK ── */
 .infra-block {
-  padding: 18px 20px;
-  background: var(--dim);
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  transition: border-color 0.2s;
+  padding: 18px 20px; background: var(--dim);
+  border-radius: 11px; border: 1px solid var(--border);
 }
-
-.infra-block:hover { border-color: var(--border2); }
-
 .infra-name {
   font-family: 'Clash Display', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 3px;
-  color: #fff;
+  font-size: 14px; font-weight: 600; margin-bottom: 3px; color: #fff;
 }
-
 .infra-port {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  color: var(--muted);
-  margin-bottom: 10px;
-  letter-spacing: 1px;
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--muted); margin-bottom: 10px; letter-spacing: 1px;
 }
-
 .infra-detail {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  color: var(--muted);
-  line-height: 1.7;
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--muted); line-height: 1.8;
 }
 
-/* ── DATA FLOW LABEL ── */
-.flow-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 8px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--muted);
-  text-align: center;
-  padding: 8px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
+/* ── HINT PILL ── */
+.hint-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.hint-pill {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  padding: 4px 10px; border-radius: 6px; border: 1px solid;
+  letter-spacing: .5px;
 }
 
-.flow-label::before,
-.flow-label::after {
-  content: '';
-  width: 32px; height: 1px;
-  background: var(--border);
+/* ── SCHEMA PRE ── */
+.schema-pre {
+  background: var(--dim); border-radius: 10px;
+  padding: 18px; border: 1px solid var(--border); margin-top: 4px;
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: #94a3b8; line-height: 1.9; overflow-x: auto;
 }
 
-/* ── DETECTION CHAIN ── */
-.detect-chain {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* ── UI MOCK ── */
+.ui-mock {
+  background: var(--dim); border-radius: 12px;
+  border: 1px solid var(--border2); overflow: hidden;
 }
-
-.detect-step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  background: var(--dim);
-  border-radius: 7px;
-  border: 1px solid var(--border);
+.ui-titlebar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; background: #0a0d14;
+  border-bottom: 1px solid var(--border);
 }
-
-.detect-num {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  color: var(--muted);
-  width: 16px;
+.ui-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ui-url {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--muted); background: var(--dim);
+  border-radius: 5px; padding: 3px 10px; letter-spacing: .5px;
+}
+.ui-body { padding: 20px; }
+.ui-prompt {
+  background: #10161f; border: 1px solid var(--border2);
+  border-radius: 10px; padding: 13px 16px;
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  color: var(--muted); margin-bottom: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.ui-btn {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  padding: 5px 14px; border-radius: 7px;
+  background: var(--wave1); color: #000; letter-spacing: .5px;
   flex-shrink: 0;
 }
-
-.detect-name {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text);
-  flex: 1;
+.ui-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.ui-chip {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  padding: 4px 11px; border-radius: 100px;
+  border: 1px solid var(--border); color: var(--muted); letter-spacing: .5px;
+}
+.ui-chip.active { border-color: var(--wave1); color: var(--wave1); background: rgba(14,165,233,.08); }
+.filter-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+  font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted);
+}
+.filter-badge {
+  background: var(--wave1); color: #000;
+  border-radius: 100px; padding: 1px 7px;
+  font-size: 8px; font-weight: 700;
+}
+.filter-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 14px; }
+.filter-card {
+  background: #10161f; border-radius: 9px; padding: 10px 12px;
+  border: 1px solid var(--border);
+}
+.filter-card.on { border-color: rgba(14,165,233,.5); }
+.filter-label {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;
+}
+.filter-val { font-size: 9px; color: var(--wave1); }
+.slider-track {
+  height: 3px; background: var(--border); border-radius: 2px;
+  position: relative; margin-top: 4px;
+}
+.slider-fill {
+  position: absolute; left: 0; top: 0; height: 100%;
+  background: var(--wave1); border-radius: 2px;
+}
+.slider-thumb {
+  position: absolute; top: -4px;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--wave1); border: 2px solid #fff;
+  transform: translateX(-50%);
+  box-shadow: 0 0 6px rgba(14,165,233,.5);
+}
+.toggle-pill {
+  width: 28px; height: 16px; border-radius: 8px;
+  position: relative; flex-shrink: 0;
+}
+.toggle-dot {
+  position: absolute; top: 2px; width: 12px; height: 12px;
+  border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+.ui-track-row {
+  display: grid; grid-template-columns: 20px 34px 1fr auto auto auto;
+  gap: 10px; align-items: center; padding: 7px 8px;
+  border-radius: 8px; font-size: 11px;
+}
+.ui-track-row:hover, .ui-track-row.playing {
+  background: rgba(14,165,233,.05);
+}
+.ui-track-num {
+  font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); text-align: right;
+}
+.ui-track-thumb {
+  width: 34px; height: 34px; border-radius: 6px;
+  background: var(--border); display: flex; align-items: center;
+  justify-content: center; font-size: 14px;
+}
+.ui-track-title { font-size: 12px; font-weight: 600; color: var(--text); }
+.ui-track-sub {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  color: var(--muted); margin-top: 2px;
+}
+.ui-track-dur {
+  font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted);
+}
+.film-panel {
+  margin: 3px 0 6px 44px;
+  background: #0c1220; border: 1px solid rgba(99,102,241,.25);
+  border-radius: 9px; padding: 10px 14px;
+  display: flex; gap: 20px;
+}
+.film-label {
+  font-family: 'DM Mono', monospace; font-size: 7px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 3px;
+}
+.film-val { font-size: 11px; color: var(--text); }
+.imdb-badge {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  padding: 2px 6px; border-radius: 4px;
+  border: 1px solid rgba(14,165,233,.4); color: var(--wave1);
+  margin-left: 6px; vertical-align: middle;
 }
 
-.detect-conf {
-  font-family: 'DM Mono', monospace;
-  font-size: 8px;
-  padding: 2px 7px;
-  border-radius: 4px;
-  border: 1px solid;
+/* ── TIMING BOX ── */
+.timing-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-top: 16px; }
+.timing-box {
+  padding: 9px 12px; background: var(--dim);
+  border-radius: 7px; border: 1px solid var(--border);
 }
-
-/* ── TIMING TABLE ── */
-.timing-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.timing-table th,
-.timing-table td {
-  text-align: left;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-}
-
-.timing-table th {
-  color: var(--muted);
-  font-size: 8px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  background: var(--dim);
-}
-
-.timing-table td { color: var(--text); }
-
-.timing-table tr:last-child td { border-bottom: none; }
-
-.timing-table tr:hover td { background: #0e1520; }
-
-.timing-bar-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.timing-bar {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--wave1);
-  opacity: 0.6;
-}
-
-/* ── ANIM ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.card, .infra-block, .adapter-card {
-  animation: fadeUp 0.4s ease both;
-}
-
-/* stagger via nth-child would need JS, so we do general delay */
-.page > * { animation: fadeUp 0.5s ease both; }
-.page > *:nth-child(1) { animation-delay: 0.05s; }
-.page > *:nth-child(2) { animation-delay: 0.1s; }
-.page > *:nth-child(3) { animation-delay: 0.15s; }
-.page > *:nth-child(4) { animation-delay: 0.2s; }
-.page > *:nth-child(5) { animation-delay: 0.25s; }
-.page > *:nth-child(6) { animation-delay: 0.3s; }
-.page > *:nth-child(7) { animation-delay: 0.35s; }
-
-/* scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-/* ── DUAL PATH ── */
-.dual-path {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 12px;
-  align-items: center;
-}
-
-.dual-path-divider {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  color: var(--muted);
-  text-align: center;
-  padding: 0 8px;
-}
-
-/* ── MERGE BOX ── */
-.merge-box {
-  background: var(--dim);
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  padding: 14px 18px;
-  text-align: center;
-}
-
-.merge-formula {
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  color: var(--wave1);
-  margin-top: 6px;
-}
-
+.timing-label { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--muted); }
+.timing-val { font-size: 17px; font-weight: 700; color: #fff; margin: 3px 0; }
+.timing-note { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--muted); }
 </style>
 </head>
 <body>
 
-<!-- ══ HEADER ══ -->
+<!-- HEADER -->
 <div class="header">
   <div class="brand">
     <div class="logo-mark">〜</div>
     <div class="brand-text">
       <h1>Driftwave</h1>
-      <p>System Design v1.0 — Full Architecture</p>
+      <p>System Design v1.1 — Full Architecture</p>
     </div>
   </div>
-  <div class="header-meta">
-    <div class="legend">
-      <div class="leg"><div class="leg-dot" style="background:var(--wave3)"></div>Indexer</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--wave2)"></div>Vector / AI</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--wave1)"></div>API</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--wave4)"></div>Navidrome</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--wave7)"></div>Adapters</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--wave5)"></div>Mobile</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--wave6)"></div>Web</div>
-    </div>
+  <div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:var(--wave3)"></div>Indexer</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--wave2)"></div>Vector / AI</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--wave1)"></div>API</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--wave4)"></div>Navidrome</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--wave7)"></div>Adapters</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--wave5)"></div>Mobile</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--wave6)"></div>Web</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--wave8)"></div>New</div>
   </div>
 </div>
 
 <div class="page">
 
-  <!-- ══ SECTION 1: INDEXER PIPELINE ══ -->
-  <div>
-    <div class="section-label">01 — Indexer Pipeline · One-shot &amp; Watch Mode</div>
-    <div class="card orange" style="padding:28px 28px 24px;">
-      <div class="card-accent acc-orange"></div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
-        <div>
-          <div class="card-title">Indexer Service</div>
-          <div class="card-sub s-orange">Python · librosa · mutagen · CLAP · Ollama</div>
-        </div>
-        <div class="tags" style="margin-top:0;">
-          <span class="tag t-orange">--scan</span>
-          <span class="tag t-orange">--watch</span>
-          <span class="tag t-orange">Redis Queue</span>
-          <span class="tag t-orange">4 CPU workers</span>
+<!-- ══ 01 INDEXER PIPELINE ══ -->
+<div>
+  <div class="sec">01 — Indexer Pipeline · One-shot &amp; Watch Mode</div>
+  <div class="card" style="padding:28px 30px 26px;">
+    <div class="card-accent acc-orange"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
+      <div>
+        <div class="card-title">Indexer Service</div>
+        <div class="card-sub s-orange">Python 3.11 · librosa · mutagen · CLAP · Ollama · TMDB</div>
+      </div>
+      <div class="tags" style="margin:0;">
+        <span class="tag t-orange">--scan</span>
+        <span class="tag t-orange">--watch</span>
+        <span class="tag t-orange">Redis Queue</span>
+        <span class="tag t-orange">4 CPU workers</span>
+      </div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipe-node">
+        <div class="pipe-box c-dim">
+          <div class="pipe-name">🎵 Music Files</div>
+          <div class="pipe-sub">mp3 · flac · ogg<br>mounted /music</div>
         </div>
       </div>
-
-      <div class="pipeline-flow">
-
-        <div class="pipe-node">
-          <div class="pipe-box c-dim">
-            <div class="pipe-box-name">🎵 Music Files</div>
-            <div class="pipe-box-sub">mp3 · flac · ogg<br>mounted /music</div>
-          </div>
+      <div class="pipe-arrow"><div class="pipe-arrow-line"></div></div>
+      <div class="pipe-node">
+        <div class="pipe-box c-orange">
+          <div class="pipe-name">Lang Detector</div>
+          <div class="pipe-sub">unicode script<br>artist DB<br>path hints<br>fasttext<br>AcoustID</div>
         </div>
-
-        <div class="pipe-connector"><div class="pipe-connector-line"></div></div>
-
-        <div class="pipe-node">
-          <div class="pipe-box c-orange">
-            <div class="pipe-box-name">Lang Detector</div>
-            <div class="pipe-box-sub">unicode script<br>artist DB<br>path hints<br>fasttext</div>
-          </div>
-          <div class="pipe-label">detect</div>
-        </div>
-
-        <div class="pipe-connector"><div class="pipe-connector-line"></div></div>
-
-        <div class="pipe-node">
-          <div class="pipe-box c-orange">
-            <div class="pipe-box-name">Lang Adapter</div>
-            <div class="pipe-box-sub">Tamil / Hindi<br>Korean / Arabic<br>Default fallback</div>
-          </div>
-          <div class="pipe-label">route</div>
-        </div>
-
-        <div class="pipe-connector"><div class="pipe-connector-line"></div></div>
-
-        <div class="pipe-node">
-          <div class="pipe-box c-orange">
-            <div class="pipe-box-name">ID3 Extractor</div>
-            <div class="pipe-box-sub">mutagen<br>title · artist<br>composer · film<br>USLT lyrics</div>
-          </div>
-          <div class="pipe-label">tags</div>
-        </div>
-
-        <div class="pipe-connector"><div class="pipe-connector-line"></div></div>
-
-        <div class="pipe-node">
-          <div class="pipe-box c-orange">
-            <div class="pipe-box-name">Audio Analyzer</div>
-            <div class="pipe-box-sub">librosa 30s<br>tempo · energy<br>valence · key<br>4 workers</div>
-          </div>
-          <div class="pipe-label">features</div>
-        </div>
-
-        <div class="pipe-connector"><div class="pipe-connector-line"></div></div>
-
-        <div class="pipe-node">
-          <div class="pipe-box c-orange">
-            <div class="pipe-box-name">Lyrics Fetch</div>
-            <div class="pipe-box-sub">embedded → .lrc<br>→ lrclib<br>→ Genius<br>→ scrape</div>
-          </div>
-          <div class="pipe-label">waterfall</div>
-        </div>
-
-        <div class="pipe-connector"><div class="pipe-connector-line"></div></div>
-
-        <div class="pipe-node">
-          <div class="pipe-box c-indigo">
-            <div class="pipe-box-name">AI Describer</div>
-            <div class="pipe-box-sub">Ollama Gemma2:9b<br>GPU · Tamil-aware<br>composer sigs<br>→ template fallback</div>
-          </div>
-          <div class="pipe-label">describe</div>
-        </div>
-
-        <div class="pipe-connector"><div class="pipe-connector-line"></div></div>
-
-        <div class="pipe-node">
-          <div class="pipe-box c-indigo">
-            <div class="pipe-box-name">CLAP Embed</div>
-            <div class="pipe-box-sub">DCLAP audio<br>512-dim<br>GPU · 4060Ti<br>audio↔text align</div>
-          </div>
-          <div class="pipe-label">audio vec</div>
-        </div>
-
-        <div class="pipe-connector"><div class="pipe-connector-line"></div></div>
-
-        <div class="pipe-node">
-          <div class="pipe-box c-indigo">
-            <div class="pipe-box-name">Text Embed</div>
-            <div class="pipe-box-sub">sentence-transformers<br>all-MiniLM-L6-v2<br>384-dim · GPU</div>
-          </div>
-          <div class="pipe-label">text vec</div>
-        </div>
-
-        <div class="pipe-connector"><div class="pipe-connector-line"></div></div>
-
-        <div class="pipe-node">
-          <div class="pipe-box c-indigo">
-            <div class="pipe-box-name">Qdrant</div>
-            <div class="pipe-box-sub">dual vectors<br>cosine sim<br>:6333<br>rich payload</div>
-          </div>
-          <div class="pipe-label">store</div>
-        </div>
-
+        <div class="pipe-lbl">detect</div>
       </div>
+      <div class="pipe-arrow"><div class="pipe-arrow-line"></div></div>
+      <div class="pipe-node">
+        <div class="pipe-box c-orange">
+          <div class="pipe-name">Lang Adapter</div>
+          <div class="pipe-sub">Tamil · Hindi<br>Korean · Arabic<br>Telugu · Default</div>
+        </div>
+        <div class="pipe-lbl">route</div>
+      </div>
+      <div class="pipe-arrow"><div class="pipe-arrow-line"></div></div>
+      <div class="pipe-node">
+        <div class="pipe-box c-orange">
+          <div class="pipe-name">ID3 Extractor</div>
+          <div class="pipe-sub">mutagen<br>title · artist<br>composer · film<br>USLT lyrics</div>
+        </div>
+        <div class="pipe-lbl">tags</div>
+      </div>
+      <div class="pipe-arrow"><div class="pipe-arrow-line"></div></div>
+      <div class="pipe-node">
+        <div class="pipe-box c-teal">
+          <div class="pipe-name">Site-Noise Clean<span class="tag-new">new</span></div>
+          <div class="pipe-sub">StarMusiQ.Com<br>Masstamilan…<br>strip genre tags<br>norm filenames</div>
+        </div>
+        <div class="pipe-lbl">clean</div>
+      </div>
+      <div class="pipe-arrow"><div class="pipe-arrow-line"></div></div>
+      <div class="pipe-node">
+        <div class="pipe-box c-teal">
+          <div class="pipe-name">TMDB Enrich<span class="tag-new">new</span></div>
+          <div class="pipe-sub">film_name + year<br>→ director<br>→ top-4 cast<br>→ IMDb URL</div>
+        </div>
+        <div class="pipe-lbl">film meta</div>
+      </div>
+      <div class="pipe-arrow"><div class="pipe-arrow-line"></div></div>
+      <div class="pipe-node">
+        <div class="pipe-box c-orange">
+          <div class="pipe-name">Audio Analyzer</div>
+          <div class="pipe-sub">librosa 30s<br>tempo · energy<br>valence · key<br>4 workers</div>
+        </div>
+        <div class="pipe-lbl">features</div>
+      </div>
+      <div class="pipe-arrow"><div class="pipe-arrow-line"></div></div>
+      <div class="pipe-node">
+        <div class="pipe-box c-orange">
+          <div class="pipe-name">Lyrics Fetch</div>
+          <div class="pipe-sub">embedded USLT<br>→ .lrc file<br>→ lrclib<br>→ Genius</div>
+        </div>
+        <div class="pipe-lbl">waterfall</div>
+      </div>
+      <div class="pipe-arrow"><div class="pipe-arrow-line"></div></div>
+      <div class="pipe-node">
+        <div class="pipe-box c-indigo">
+          <div class="pipe-name">AI Describer</div>
+          <div class="pipe-sub">Ollama Gemma2:9b<br>GPU · Tamil-aware<br>composer sigs<br>→ tmpl fallback</div>
+        </div>
+        <div class="pipe-lbl">describe</div>
+      </div>
+      <div class="pipe-arrow"><div class="pipe-arrow-line"></div></div>
+      <div class="pipe-node">
+        <div class="pipe-box c-indigo">
+          <div class="pipe-name">CLAP Embed</div>
+          <div class="pipe-sub">DCLAP audio<br>512-dim · GPU<br>audio↔text align<br>4060 Ti</div>
+        </div>
+        <div class="pipe-lbl">audio vec</div>
+      </div>
+      <div class="pipe-arrow"><div class="pipe-arrow-line"></div></div>
+      <div class="pipe-node">
+        <div class="pipe-box c-indigo">
+          <div class="pipe-name">Text Embed</div>
+          <div class="pipe-sub">all-MiniLM-L6-v2<br>384-dim · GPU<br>sentence-transformers</div>
+        </div>
+        <div class="pipe-lbl">text vec</div>
+      </div>
+      <div class="pipe-arrow"><div class="pipe-arrow-line"></div></div>
+      <div class="pipe-node">
+        <div class="pipe-box c-indigo">
+          <div class="pipe-name">Qdrant</div>
+          <div class="pipe-sub">dual vectors<br>cosine sim<br>:6333<br>payload indexes</div>
+        </div>
+        <div class="pipe-lbl">store</div>
+      </div>
+    </div>
 
-      <!-- Timing row -->
-      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
-        <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Timing on 4060 Ti · 1000 songs</div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
-          <div style="padding:8px 10px;background:var(--dim);border-radius:6px;border:1px solid var(--border);">
-            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">librosa</div>
-            <div style="font-size:16px;font-weight:700;color:#fff;margin:2px 0;">~5 min</div>
-            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">4 CPU workers</div>
-          </div>
-          <div style="padding:8px 10px;background:var(--dim);border-radius:6px;border:1px solid var(--border);">
-            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">Ollama GPU</div>
-            <div style="font-size:16px;font-weight:700;color:#fff;margin:2px 0;">~15 min</div>
-            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">Gemma2:9b</div>
-          </div>
-          <div style="padding:8px 10px;background:var(--dim);border-radius:6px;border:1px solid var(--border);">
-            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">CLAP embed</div>
-            <div style="font-size:16px;font-weight:700;color:#fff;margin:2px 0;">~3 min</div>
-            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">GPU · DCLAP</div>
-          </div>
-          <div style="padding:8px 10px;background:var(--dim);border-radius:6px;border:1px solid var(--border);">
-            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">lyrics fetch</div>
-            <div style="font-size:16px;font-weight:700;color:#fff;margin:2px 0;">~2 min</div>
-            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">local-first</div>
-          </div>
-          <div style="padding:8px 10px;background:var(--dim);border-radius:6px;border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.06);">
-            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--wave1);">TOTAL</div>
-            <div style="font-size:16px;font-weight:700;color:var(--wave1);margin:2px 0;">~25 min</div>
-            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);">one-time run</div>
-          </div>
+    <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border);">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Timing on 4060 Ti · 1000 songs</div>
+      <div class="timing-grid">
+        <div class="timing-box">
+          <div class="timing-label">librosa</div>
+          <div class="timing-val">~5 min</div>
+          <div class="timing-note">4 CPU workers</div>
+        </div>
+        <div class="timing-box">
+          <div class="timing-label">Ollama GPU</div>
+          <div class="timing-val">~15 min</div>
+          <div class="timing-note">Gemma2:9b</div>
+        </div>
+        <div class="timing-box">
+          <div class="timing-label">CLAP embed</div>
+          <div class="timing-val">~3 min</div>
+          <div class="timing-note">GPU · DCLAP</div>
+        </div>
+        <div class="timing-box">
+          <div class="timing-label">lyrics fetch</div>
+          <div class="timing-val">~2 min</div>
+          <div class="timing-note">local-first</div>
+        </div>
+        <div class="timing-box" style="border-color:rgba(14,165,233,.35);background:rgba(14,165,233,.07);">
+          <div class="timing-label" style="color:var(--wave1);">TOTAL</div>
+          <div class="timing-val" style="color:var(--wave1);">~25 min</div>
+          <div class="timing-note">one-time run</div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- ══ SECTION 2: LANG ADAPTERS ══ -->
-  <div>
-    <div class="section-label">02 — Language Adapter System</div>
-    <div class="card violet">
-      <div class="card-accent acc-violet"></div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
-        <div>
-          <div class="card-title">Pluggable Culture Adapters</div>
-          <div class="card-sub s-violet">Detects language → routes to specialist → CLAP fallback always active</div>
-        </div>
+<!-- ══ 02 LANGUAGE ADAPTERS ══ -->
+<div>
+  <div class="sec">02 — Language Adapter System · Culture-Aware Enrichment</div>
+  <div class="card" style="padding:26px 30px;">
+    <div class="card-accent acc-violet"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
+      <div>
+        <div class="card-title">Pluggable Culture Adapters</div>
+        <div class="card-sub s-violet">Detects language → routes to specialist → CLAP fallback always active</div>
       </div>
+    </div>
 
-      <!-- Detection chain -->
-      <div style="margin-bottom:20px;">
+    <div class="g2" style="gap:24px;align-items:start;">
+      <div>
         <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Detection Pipeline — ordered by confidence</div>
         <div class="detect-chain">
           <div class="detect-step">
             <div class="detect-num">01</div>
             <div class="detect-name">Unicode Script Detection</div>
-            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);flex:1;">Tamil tamil · Devanagari · Hangul · Arabic · CJK</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);flex:1;">Tamil · Devanagari · Hangul · Arabic · CJK</div>
             <div class="detect-conf t-green">~99%</div>
           </div>
           <div class="detect-step">
             <div class="detect-num">02</div>
             <div class="detect-name">Artist / Composer Knowledge DB</div>
-            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);flex:1;">AR Rahman, Yuvan, BTS, etc. — handles transliterated names</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);flex:1;">AR Rahman, Yuvan, BTS — handles transliterated names</div>
             <div class="detect-conf t-blue">~95%</div>
           </div>
           <div class="detect-step">
             <div class="detect-num">03</div>
             <div class="detect-name">Folder / Path Hints</div>
-            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);flex:1;">/Tamil Songs/, /Bollywood/, /K-Pop/ etc.</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);flex:1;">/Tamil Songs/, /Bollywood/, /K-Pop/ …</div>
             <div class="detect-conf t-amber">~90%</div>
           </div>
           <div class="detect-step">
             <div class="detect-num">04</div>
             <div class="detect-name">Lyrics · fasttext lid.176</div>
-            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);flex:1;">176-language model, conf threshold 0.6</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);flex:1;">176-language model · conf threshold 0.6</div>
             <div class="detect-conf t-blue">~85%</div>
           </div>
           <div class="detect-step">
             <div class="detect-num">05</div>
             <div class="detect-name">AcoustID Fingerprint → MusicBrainz</div>
-            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);flex:1;">For completely untagged files</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);flex:1;">For completely untagged files (pyacoustid)</div>
             <div class="detect-conf t-orange">~70%</div>
           </div>
         </div>
+
+        <div style="margin-top:18px;background:var(--dim);border-radius:10px;border:1px solid rgba(52,211,153,.2);padding:14px 16px;">
+          <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--wave8);margin-bottom:8px;">Site-Noise Normalization · New</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.8;">
+            Strips distributor watermarks injected into ID3 tags &amp; filenames:<br>
+            <span style="color:#94a3b8;">(StarMusiQ.Com) · [Masstamilan] · (Isaimini) · 01-03 - prefix…</span><br>
+            Both sides normalised before Subsonic ID matching ↔ Navidrome
+          </div>
+        </div>
       </div>
 
-      <!-- Adapters -->
-      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Adapter Registry</div>
-      <div class="adapter-grid">
-        <div class="adapter-card">
-          <div class="adapter-flag">🎵</div>
-          <div class="adapter-lang">Tamil</div>
-          <div class="adapter-detail">Composer signatures<br>Film/movie context<br>Kuthu/Melody/Gaana<br>Carnatic elements<br>lrclib → Genius → tamilpaa</div>
-        </div>
-        <div class="adapter-card">
-          <div class="adapter-flag">🎬</div>
-          <div class="adapter-lang">Hindi</div>
-          <div class="adapter-detail">Bollywood era detection<br>Composer vibes<br>Lyricist context<br>Film vs indie<br>50s–present mapping</div>
-        </div>
-        <div class="adapter-card">
-          <div class="adapter-flag">🌸</div>
-          <div class="adapter-lang">Korean</div>
-          <div class="adapter-detail">K-pop concept tags<br>Idol group detection<br>Trot / ballad / hip-hop<br>Melon API lyrics</div>
-        </div>
-        <div class="adapter-card">
-          <div class="adapter-flag">🎸</div>
-          <div class="adapter-lang">Arabic</div>
-          <div class="adapter-detail">Maqam scale detection<br>Regional variants<br>Khaleeji / Egyptian<br>Oud / qanun context</div>
-        </div>
-        <div class="adapter-card">
-          <div class="adapter-flag">🪗</div>
-          <div class="adapter-lang">Telugu</div>
-          <div class="adapter-detail">Tollywood composers<br>Devi Sri Prasad<br>SS Thaman vibes<br>Folk vs filmi</div>
-        </div>
-        <div class="adapter-card">
-          <div class="adapter-flag">🌺</div>
-          <div class="adapter-lang">Malayalam</div>
-          <div class="adapter-detail">Mollywood context<br>Gopi Sundar style<br>Kerala folk elements<br>devotional tags</div>
-        </div>
-        <div class="adapter-card">
-          <div class="adapter-flag">🎷</div>
-          <div class="adapter-lang">Japanese</div>
-          <div class="adapter-detail">J-pop / city pop<br>Anime OST context<br>Visual kei tags<br>Enka detection</div>
-        </div>
-        <div class="adapter-card">
-          <div class="adapter-flag">🎻</div>
-          <div class="adapter-lang">Western</div>
-          <div class="adapter-detail">Genre taxonomy<br>Decade mapping<br>Label / scene tags<br>Allmusic context</div>
-        </div>
-        <div class="adapter-fallback">
-          <div style="font-size:20px;">🌐</div>
-          <div style="flex:1;">
-            <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;">Default Adapter — Universal Fallback</div>
-            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);">Any unrecognised language → generic template + CLAP audio embedding carries semantic weight · Register custom adapters via AdapterRegistry.register()</div>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Adapter Registry · 8 Adapters</div>
+        <div class="adapter-grid">
+          <div class="adapter-card">
+            <div class="adapter-flag">🎵</div>
+            <div class="adapter-lang">Tamil</div>
+            <div class="adapter-detail">Composer signatures<br>TMDB film enrichment<br>Kuthu/Melody/Gaana<br>Carnatic elements<br>lyricist context</div>
           </div>
-          <div class="tag t-violet">extendable</div>
+          <div class="adapter-card">
+            <div class="adapter-flag">🎬</div>
+            <div class="adapter-lang">Hindi</div>
+            <div class="adapter-detail">Bollywood era detection<br>Lyricist context<br>Film vs indie<br>50s–present mapping</div>
+          </div>
+          <div class="adapter-card">
+            <div class="adapter-flag">🌸</div>
+            <div class="adapter-lang">Korean</div>
+            <div class="adapter-detail">K-pop concept tags<br>Idol group detection<br>Trot / ballad / hip-hop<br>Melon API lyrics</div>
+          </div>
+          <div class="adapter-card">
+            <div class="adapter-flag">🎸</div>
+            <div class="adapter-lang">Arabic</div>
+            <div class="adapter-detail">Maqam scale detection<br>Regional variants<br>Khaleeji / Egyptian<br>Oud / qanun context</div>
+          </div>
+          <div class="adapter-card">
+            <div class="adapter-flag">🪗</div>
+            <div class="adapter-lang">Telugu</div>
+            <div class="adapter-detail">Tollywood composers<br>DSP / SS Thaman<br>Folk vs filmi</div>
+          </div>
+          <div class="adapter-card">
+            <div class="adapter-flag">🌺</div>
+            <div class="adapter-lang">Malayalam</div>
+            <div class="adapter-detail">Mollywood context<br>Gopi Sundar style<br>Kerala folk · devotional</div>
+          </div>
+          <div class="adapter-card">
+            <div class="adapter-flag">🎷</div>
+            <div class="adapter-lang">Japanese</div>
+            <div class="adapter-detail">J-pop / city pop<br>Anime OST context<br>Visual kei · enka</div>
+          </div>
+          <div class="adapter-card">
+            <div class="adapter-flag">🎻</div>
+            <div class="adapter-lang">Western</div>
+            <div class="adapter-detail">Genre taxonomy<br>Decade mapping<br>Label / scene tags</div>
+          </div>
+          <div class="adapter-fallback">
+            <div style="font-size:20px;">🌐</div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;">Default Adapter — Universal Fallback</div>
+              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);">Any unrecognised language → generic template + CLAP audio embedding carries semantic weight · Add your own via AdapterRegistry.register()</div>
+            </div>
+            <div class="tag t-violet">extendable</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 03 RAG QUERY FLOW + SERVICES ══ -->
+<div class="g3" style="align-items:start;">
+
+  <!-- Query Flow -->
+  <div class="card" style="height:100%;">
+    <div class="card-accent acc-blue"></div>
+    <div class="card-title">RAG Query Flow</div>
+    <div class="card-sub s-blue">Runtime · Every Search</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(249,115,22,.15);color:var(--wave3);">01</div>
+        <div class="step-body">
+          <div class="step-title">User Prompt</div>
+          <div class="step-detail"><strong>"songs from Maari 2015"</strong><br>or mood sliders + chip combos</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(99,102,241,.15);color:var(--wave2);">02</div>
+        <div class="step-body">
+          <div class="step-title">Tag Extraction <span class="tag-new">12 hints</span></div>
+          <div class="step-detail">Ollama Gemma2:9b extracts structured tags:<br>
+            <div class="hint-grid" style="margin-top:6px;">
+              <span class="hint-pill t-indigo">composer</span>
+              <span class="hint-pill t-indigo">film</span>
+              <span class="hint-pill t-indigo">lyricist</span>
+              <span class="hint-pill t-teal">cast</span>
+              <span class="hint-pill t-indigo">artist</span>
+              <span class="hint-pill t-indigo">genre</span>
+              <span class="hint-pill t-teal">tamil_genre</span>
+              <span class="hint-pill t-indigo">year_from</span>
+              <span class="hint-pill t-indigo">year_to</span>
+              <span class="hint-pill t-teal">duration</span>
+              <span class="hint-pill t-indigo">valence</span>
+              <span class="hint-pill t-indigo">key</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(14,165,233,.15);color:var(--wave1);">03</div>
+        <div class="step-body">
+          <div class="step-title">Build Qdrant Filters</div>
+          <div class="step-detail">
+            <strong>MatchText</strong> → film · lyricist · composer · cast · artist · lyrics<br>
+            <strong>MatchAny</strong> → year range (string field, list expansion)<br>
+            <strong>Range</strong> → tempo · energy · valence · duration<br>
+            <strong>threshold</strong> → 0.35 normal · 0.10 when filters present
+          </div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(99,102,241,.15);color:var(--wave2);">04</div>
+        <div class="step-body">
+          <div class="step-title">Dual Vector Search</div>
+          <div class="step-detail">Path A: text RAG (Qdrant · 384-dim)<br>Path B: CLAP audio (Qdrant · 512-dim)<br><strong>parallel · merged by score</strong></div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(14,165,233,.15);color:var(--wave1);">05</div>
+        <div class="step-body">
+          <div class="step-title">Merge + Score</div>
+          <div class="step-detail"><strong>0.6 × text + 0.4 × CLAP</strong> · Tamil: 0.7/0.3</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(52,211,153,.15);color:var(--wave8);">06</div>
+        <div class="step-body">
+          <div class="step-title">Duration Limit <span class="tag-new">new</span></div>
+          <div class="step-detail">Accumulate durations in rank order<br><strong>stop when total exceeds cap</strong> (e.g. 300 min)</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(16,185,129,.15);color:var(--wave4);">07</div>
+        <div class="step-body">
+          <div class="step-title">Push to Navidrome</div>
+          <div class="step-detail">Subsonic API playlist create<br>subsonic_id matched via normalised stem</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num" style="background:rgba(244,63,94,.15);color:var(--wave5);">08</div>
+        <div class="step-body">
+          <div class="step-title">Return to Client</div>
+          <div class="step-detail">tracks + extracted_tags + total_duration<br>film tracks include director · cast · IMDb</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SECTION 3: RAG QUERY FLOW + SERVICES ══ -->
-  <div class="grid-3" style="align-items:start;">
-
-    <!-- Query Flow -->
-    <div class="card blue">
+  <!-- FastAPI + Navidrome -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div class="card">
       <div class="card-accent acc-blue"></div>
-      <div class="card-title">RAG Query Flow</div>
-      <div class="card-sub s-blue">Runtime · Every Search</div>
-
-      <div class="flow-steps">
-        <div class="flow-step">
-          <div class="step-num" style="background:rgba(249,115,22,0.15);color:var(--wave3);">01</div>
-          <div class="step-body">
-            <div class="step-title">User Prompt</div>
-            <div class="step-detail"><strong>"melancholic AR Rahman 90s slow"</strong><br>natural language or mood sliders</div>
+      <div class="card-title">FastAPI Backend</div>
+      <div class="card-sub s-blue">Service · :8000</div>
+      <div class="items">
+        <div class="item">
+          <div class="item-icon">🔍</div>
+          <div>
+            <div class="item-name">POST /search</div>
+            <div class="item-desc">prompt → 12 hint tags → dual search → ranked tracks<br>duration_limit_secs · lang_filter · mood sliders</div>
           </div>
         </div>
-        <div class="flow-step">
-          <div class="step-num" style="background:rgba(99,102,241,0.15);color:var(--wave2);">02</div>
-          <div class="step-body">
-            <div class="step-title">Tag Extraction</div>
-            <div class="step-detail">Ollama extracts:<br><strong>mood, tempo, era, composer, genre</strong></div>
+        <div class="item">
+          <div class="item-icon">📋</div>
+          <div>
+            <div class="item-name">POST /playlist/generate-and-push</div>
+            <div class="item-desc">prompt + filters → playlist → Navidrome</div>
           </div>
         </div>
-        <div class="flow-step">
-          <div class="step-num" style="background:rgba(99,102,241,0.15);color:var(--wave2);">03</div>
-          <div class="step-body">
-            <div class="step-title">Dual Vector Search</div>
-            <div class="step-detail">Path A: text RAG (Qdrant)<br>Path B: CLAP audio search<br><strong>parallel, merged by score</strong></div>
+        <div class="item">
+          <div class="item-icon">🎵</div>
+          <div>
+            <div class="item-name">GET /stream/by-path · /cover/{id}</div>
+            <div class="item-desc">audio proxy · album art from Navidrome</div>
           </div>
         </div>
-        <div class="flow-step">
-          <div class="step-num" style="background:rgba(14,165,233,0.15);color:var(--wave1);">04</div>
-          <div class="step-body">
-            <div class="step-title">Merge + Score</div>
-            <div class="step-detail"><strong>0.6 × text RAG + 0.4 × CLAP</strong><br>top 50 candidates</div>
+        <div class="item">
+          <div class="item-icon">📖</div>
+          <div>
+            <div class="item-name">GET /library/lyrics?path=</div>
+            <div class="item-desc">lyrics lookup → subsonic_id via normalised match</div>
           </div>
         </div>
-        <div class="flow-step">
-          <div class="step-num" style="background:rgba(14,165,233,0.15);color:var(--wave1);">05</div>
-          <div class="step-body">
-            <div class="step-title">Diversity Filter</div>
-            <div class="step-detail">max 3 per artist<br>balance era distribution</div>
+        <div class="item">
+          <div class="item-icon">🐛</div>
+          <div>
+            <div class="item-name">GET /search/debug/tags?q=</div>
+            <div class="item-desc">raw LLM tag extraction — diagnosis endpoint</div>
           </div>
         </div>
-        <div class="flow-step">
-          <div class="step-num" style="background:rgba(14,165,233,0.15);color:var(--wave1);">06</div>
-          <div class="step-body">
-            <div class="step-title">LLM Rerank</div>
-            <div class="step-detail">Ollama reranks 50 → 20<br>context-aware final order</div>
-          </div>
-        </div>
-        <div class="flow-step">
-          <div class="step-num" style="background:rgba(16,185,129,0.15);color:var(--wave4);">07</div>
-          <div class="step-body">
-            <div class="step-title">Push to Navidrome</div>
-            <div class="step-detail">Subsonic API playlist create<br>Navidrome plugin registration</div>
-          </div>
-        </div>
-        <div class="flow-step">
-          <div class="step-num" style="background:rgba(244,63,94,0.15);color:var(--wave5);">08</div>
-          <div class="step-body">
-            <div class="step-title">Return to Client</div>
-            <div class="step-detail">Flutter mobile or React web<br>stream via Navidrome proxy</div>
-          </div>
-        </div>
+      </div>
+      <div class="tags">
+        <span class="tag t-blue">FastAPI</span>
+        <span class="tag t-blue">async</span>
+        <span class="tag t-blue">JWT</span>
       </div>
     </div>
 
-    <!-- FastAPI -->
-    <div style="display:flex;flex-direction:column;gap:16px;">
-      <div class="card blue">
-        <div class="card-accent acc-blue"></div>
-        <div class="card-title">FastAPI Backend</div>
-        <div class="card-sub s-blue">Service · :8000</div>
-        <div class="items">
-          <div class="item">
-            <div class="item-icon">🔍</div>
-            <div class="item-body">
-              <div class="item-name">POST /search</div>
-              <div class="item-desc">prompt → tags → dual search → rerank</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">📋</div>
-            <div class="item-body">
-              <div class="item-name">POST /playlist/generate</div>
-              <div class="item-desc">prompt + mood filters → playlist object</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">⬆️</div>
-            <div class="item-body">
-              <div class="item-name">POST /playlist/push</div>
-              <div class="item-desc">create in Navidrome via Subsonic API</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">🎵</div>
-            <div class="item-body">
-              <div class="item-name">GET /stream/{id}</div>
-              <div class="item-desc">proxy audio stream from Navidrome</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">📚</div>
-            <div class="item-body">
-              <div class="item-name">GET /library/*</div>
-              <div class="item-desc">artists · albums · tracks · search</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">🔌</div>
-            <div class="item-body">
-              <div class="item-name">Navidrome Plugin</div>
-              <div class="item-desc">registers as instant-mix provider</div>
-            </div>
+    <div class="card">
+      <div class="card-accent acc-green"></div>
+      <div class="card-title">Navidrome</div>
+      <div class="card-sub s-green">Music Server · :4533</div>
+      <div class="items">
+        <div class="item">
+          <div class="item-icon">🗄️</div>
+          <div>
+            <div class="item-name">Music Server</div>
+            <div class="item-desc">indexes /music · album art · metadata</div>
           </div>
         </div>
-        <div class="tags">
-          <span class="tag t-blue">FastAPI</span>
-          <span class="tag t-blue">JWT auth</span>
-          <span class="tag t-blue">async</span>
+        <div class="item">
+          <div class="item-icon">🔌</div>
+          <div>
+            <div class="item-name">Subsonic / OpenSubsonic API</div>
+            <div class="item-desc">search3 · stream · playlists · instant-mix</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">🔗</div>
+          <div>
+            <div class="item-name">Normalised ID Matching</div>
+            <div class="item-desc">stem match after stripping site-noise &amp; track prefixes</div>
+          </div>
         </div>
       </div>
-
-      <div class="card green">
-        <div class="card-accent acc-green"></div>
-        <div class="card-title">Navidrome</div>
-        <div class="card-sub s-green">Music Server · :4533</div>
-        <div class="items">
-          <div class="item">
-            <div class="item-icon">🗄️</div>
-            <div class="item-body">
-              <div class="item-name">Music Server</div>
-              <div class="item-desc">indexes /music · album art · metadata</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">🔌</div>
-            <div class="item-body">
-              <div class="item-name">Subsonic / OpenSubsonic API</div>
-              <div class="item-desc">stream · playlists · instant-mix plugin</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">🆔</div>
-            <div class="item-body">
-              <div class="item-name">MusicBrainz ID</div>
-              <div class="item-desc">MBID stored in Qdrant payload for cross-ref</div>
-            </div>
-          </div>
-        </div>
-        <div class="tags">
-          <span class="tag t-green">Docker</span>
-          <span class="tag t-green">SQLite</span>
-          <span class="tag t-green">:4533</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Clients -->
-    <div style="display:flex;flex-direction:column;gap:16px;">
-      <div class="card rose">
-        <div class="card-accent acc-rose"></div>
-        <div class="card-title">Flutter Mobile</div>
-        <div class="card-sub s-rose">iOS + Android · Full Client</div>
-        <div class="items">
-          <div class="item">
-            <div class="item-icon">✨</div>
-            <div class="item-body">
-              <div class="item-name">Discover (RAG)</div>
-              <div class="item-desc">prompt bar · mood sliders · energy/tempo/valence<br>conversational refinement</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">📚</div>
-            <div class="item-body">
-              <div class="item-name">Library Browser</div>
-              <div class="item-desc">artists · albums · search · Subsonic API direct</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">▶️</div>
-            <div class="item-body">
-              <div class="item-name">Player</div>
-              <div class="item-desc">just_audio · lock screen · CarPlay · queue</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">⬇️</div>
-            <div class="item-body">
-              <div class="item-name">Offline Cache</div>
-              <div class="item-desc">isar local DB · auto-cache starred tracks</div>
-            </div>
-          </div>
-        </div>
-        <div class="tags">
-          <span class="tag t-rose">Flutter</span>
-          <span class="tag t-rose">riverpod</span>
-          <span class="tag t-rose">just_audio</span>
-          <span class="tag t-rose">go_router</span>
-        </div>
-      </div>
-
-      <div class="card amber">
-        <div class="card-accent acc-amber"></div>
-        <div class="card-title">React Web App</div>
-        <div class="card-sub s-amber">Desktop Playlist Builder · :3000</div>
-        <div class="items">
-          <div class="item">
-            <div class="item-icon">🎛️</div>
-            <div class="item-body">
-              <div class="item-name">Playlist Builder</div>
-              <div class="item-desc">prompt + mood UI · push to Navidrome</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">📊</div>
-            <div class="item-body">
-              <div class="item-name">Library View</div>
-              <div class="item-desc">browse · search · manage playlists</div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="item-icon">⚙️</div>
-            <div class="item-body">
-              <div class="item-name">Index Manager</div>
-              <div class="item-desc">trigger scan · view index status · logs</div>
-            </div>
-          </div>
-        </div>
-        <div class="tags">
-          <span class="tag t-amber">React</span>
-          <span class="tag t-amber">Tailwind</span>
-          <span class="tag t-amber">:3000</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ══ SECTION 4: INFRASTRUCTURE ══ -->
-  <div>
-    <div class="section-label">04 — Infrastructure · docker-compose</div>
-    <div class="card" style="padding:24px 28px;">
-      <div class="card-accent acc-multi"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <div>
-          <div class="card-title">All Services</div>
-          <div class="card-sub" style="color:var(--muted);">Docker Compose · GPU passthrough · nvidia-container-toolkit</div>
-        </div>
-        <div class="tags" style="margin:0;">
-          <span class="tag t-blue">CUDA 12</span>
-          <span class="tag t-blue">4060 Ti</span>
-          <span class="tag t-blue">nvidia-container-toolkit</span>
-        </div>
-      </div>
-      <div class="grid-5">
-        <div class="infra-block">
-          <div class="infra-name" style="color:var(--wave4);">navidrome</div>
-          <div class="infra-port">:4533</div>
-          <div class="infra-detail">deluan/navidrome:latest<br>./music:/music:ro<br>navidrome_data:/data<br>Subsonic API + plugins</div>
-        </div>
-        <div class="infra-block">
-          <div class="infra-name" style="color:var(--wave2);">qdrant</div>
-          <div class="infra-port">:6333</div>
-          <div class="infra-detail">qdrant/qdrant:latest<br>qdrant_data:/qdrant/storage<br>dual collection:<br>text 384d + CLAP 512d</div>
-        </div>
-        <div class="infra-block">
-          <div class="infra-name" style="color:var(--wave2);">ollama</div>
-          <div class="infra-port">:11434</div>
-          <div class="infra-detail">ollama/ollama:latest<br>GPU: nvidia · all<br>gemma2:9b loaded<br>ollama_data:/root/.ollama</div>
-        </div>
-        <div class="infra-block">
-          <div class="infra-name" style="color:var(--wave3);">indexer</div>
-          <div class="infra-port">one-shot / watch</div>
-          <div class="infra-detail">build: ./indexer<br>./music:/music:ro<br>CUDA_VISIBLE_DEVICES=0<br>depends: qdrant, ollama</div>
-        </div>
-        <div class="infra-block">
-          <div class="infra-name" style="color:var(--wave1);">api</div>
-          <div class="infra-port">:8000</div>
-          <div class="infra-detail">build: ./api<br>env_file: .env<br>JWT auth<br>depends: qdrant, navidrome</div>
-        </div>
-        <div class="infra-block">
-          <div class="infra-name" style="color:var(--wave3);">redis</div>
-          <div class="infra-port">:6379</div>
-          <div class="infra-detail">redis:alpine<br>Job queue for indexer<br>RQ workers<br>batch file drops</div>
-        </div>
-        <div class="infra-block">
-          <div class="infra-name" style="color:var(--wave6);">frontend</div>
-          <div class="infra-port">:3000</div>
-          <div class="infra-detail">build: ./frontend<br>React + Tailwind<br>playlist builder UI<br>depends: api</div>
-        </div>
-        <div class="infra-block">
-          <div class="infra-name" style="color:var(--wave7);">postgres</div>
-          <div class="infra-port">:5432</div>
-          <div class="infra-detail">postgres:15-alpine<br>index metadata store<br>job history<br>pg_data volume</div>
-        </div>
-        <div class="infra-block">
-          <div class="infra-name" style="color:var(--wave5);">flutter</div>
-          <div class="infra-port">iOS · Android</div>
-          <div class="infra-detail">Connects to api:8000<br>+ navidrome:4533<br>local network<br>or via reverse proxy</div>
-        </div>
-        <div class="infra-block" style="border-color:rgba(14,165,233,0.3);background:rgba(14,165,233,0.04);">
-          <div class="infra-name" style="color:var(--wave1);">Total VRAM</div>
-          <div class="infra-port">4060 Ti 16GB</div>
-          <div class="infra-detail">Gemma2:9b: ~9GB<br>CLAP/sentence-tr: ~2GB<br>Qdrant HNSW: ~1GB<br>Headroom: ~4GB ✓</div>
-        </div>
+      <div class="tags">
+        <span class="tag t-green">Docker</span>
+        <span class="tag t-green">SQLite</span>
+        <span class="tag t-green">:4533</span>
       </div>
     </div>
   </div>
 
-  <!-- ══ SECTION 5: DATA SCHEMA ══ -->
-  <div>
-    <div class="section-label">05 — Qdrant Document Schema · per track</div>
-    <div class="card indigo">
-      <div class="card-accent acc-indigo"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-        <div>
-          <div class="card-title">Vector Payload</div>
-          <div class="card-sub s-indigo">Stored alongside dual vectors in Qdrant</div>
-          <div style="background:var(--dim);border-radius:8px;padding:16px;border:1px solid var(--border);margin-top:4px;">
-<pre style="font-family:'DM Mono',monospace;font-size:9px;color:#94a3b8;line-height:1.8;overflow-x:auto;">{
+  <!-- Clients -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div class="card">
+      <div class="card-accent acc-amber"></div>
+      <div class="card-title">React Web App <span class="tag-new">updated</span></div>
+      <div class="card-sub s-amber">Desktop Playlist Builder · :3000</div>
+      <div class="items">
+        <div class="item">
+          <div class="item-icon">🎛️</div>
+          <div>
+            <div class="item-name">Discover — Prompt + Mood</div>
+            <div class="item-desc">natural language · mood chips · lang filter</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">⚡</div>
+          <div>
+            <div class="item-name">Toggle-Enabled Sliders</div>
+            <div class="item-desc">energy · tempo · valence — opt-in only<br>collapsible panel with active count badge</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">⏱️</div>
+          <div>
+            <div class="item-name">Duration Limit Slider</div>
+            <div class="item-desc">10–600 min · disables count limit when active<br>shows total playlist time in results header</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">🎬</div>
+          <div>
+            <div class="item-name">Film Info Panel</div>
+            <div class="item-desc">🎬 button per film song → expands inline<br>film · director · cast · IMDb ↗ link</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">📖</div>
+          <div>
+            <div class="item-name">Lyrics View</div>
+            <div class="item-desc">lyrics page — embedded USLT or fetched</div>
+          </div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag t-amber">React</span>
+        <span class="tag t-amber">Vite</span>
+        <span class="tag t-amber">6 themes</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-accent acc-rose"></div>
+      <div class="card-title">Flutter Mobile</div>
+      <div class="card-sub s-rose">iOS + Android · Full Client</div>
+      <div class="items">
+        <div class="item">
+          <div class="item-icon">✨</div>
+          <div>
+            <div class="item-name">Discover (RAG)</div>
+            <div class="item-desc">prompt bar · mood sliders · energy/tempo/valence</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">▶️</div>
+          <div>
+            <div class="item-name">Player</div>
+            <div class="item-desc">just_audio · lock screen · CarPlay · queue</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">⬇️</div>
+          <div>
+            <div class="item-name">Offline Cache</div>
+            <div class="item-desc">isar local DB · auto-cache starred tracks</div>
+          </div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag t-rose">Flutter</span>
+        <span class="tag t-rose">riverpod</span>
+        <span class="tag t-rose">just_audio</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ 04 WEB UI MOCKUP ══ -->
+<div>
+  <div class="sec">04 — Web UI · Discover Page</div>
+  <div class="g2" style="gap:20px;align-items:start;">
+
+    <!-- Left: Filters -->
+    <div>
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Discover Page — Filters Panel</div>
+      <div class="ui-mock">
+        <div class="ui-titlebar">
+          <div class="ui-dot" style="background:#f43f5e;"></div>
+          <div class="ui-dot" style="background:#fbbf24;"></div>
+          <div class="ui-dot" style="background:#10b981;"></div>
+          <div class="ui-url">localhost:3000</div>
+        </div>
+        <div class="ui-body">
+          <div class="ui-prompt">
+            <span style="color:#94a3b8;">🎵 &nbsp;songs from Maari, slow melody…</span>
+            <div class="ui-btn">→</div>
+          </div>
+          <div class="ui-chips">
+            <div class="ui-chip active">🌙 Late Night</div>
+            <div class="ui-chip">☀️ Morning Energy</div>
+            <div class="ui-chip">🌧️ Rainy Day</div>
+            <div class="ui-chip">🎉 Party</div>
+            <div class="ui-chip">💫 Nostalgic</div>
+          </div>
+          <div class="filter-bar">
+            <span style="font-size:9px;">▶</span>
+            Filters
+            <div class="filter-badge">2 on</div>
+          </div>
+          <div class="filter-grid">
+            <!-- Energy -->
+            <div class="filter-card on">
+              <div class="filter-label">
+                Energy min
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span class="filter-val">42%</span>
+                  <div class="toggle-pill" style="background:var(--wave1);">
+                    <div class="toggle-dot" style="right:2px;left:auto;"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="slider-track">
+                <div class="slider-fill" style="width:42%;"></div>
+                <div class="slider-thumb" style="left:42%;"></div>
+              </div>
+            </div>
+            <!-- Tempo -->
+            <div class="filter-card">
+              <div class="filter-label">
+                Tempo max
+                <div class="toggle-pill" style="background:var(--border);">
+                  <div class="toggle-dot" style="left:2px;"></div>
+                </div>
+              </div>
+              <div class="slider-track">
+                <div class="slider-fill" style="width:45%;opacity:.3;"></div>
+                <div class="slider-thumb" style="left:45%;opacity:.3;"></div>
+              </div>
+            </div>
+            <!-- Valence -->
+            <div class="filter-card on">
+              <div class="filter-label">
+                Valence min
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span class="filter-val">35%</span>
+                  <div class="toggle-pill" style="background:var(--wave1);">
+                    <div class="toggle-dot" style="right:2px;left:auto;"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="slider-track">
+                <div class="slider-fill" style="width:35%;"></div>
+                <div class="slider-thumb" style="left:35%;"></div>
+              </div>
+            </div>
+            <!-- Duration -->
+            <div class="filter-card">
+              <div class="filter-label">
+                Max duration
+                <div class="toggle-pill" style="background:var(--border);">
+                  <div class="toggle-dot" style="left:2px;"></div>
+                </div>
+              </div>
+              <div class="slider-track">
+                <div class="slider-fill" style="width:50%;opacity:.3;"></div>
+                <div class="slider-thumb" style="left:50%;opacity:.3;"></div>
+              </div>
+            </div>
+            <!-- Results (enabled) -->
+            <div class="filter-card on">
+              <div class="filter-label">
+                Results
+                <span class="filter-val">20 tracks</span>
+              </div>
+              <div class="slider-track">
+                <div class="slider-fill" style="width:20%;"></div>
+                <div class="slider-thumb" style="left:20%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Results with film panel -->
+    <div>
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Results · Film Info Panel Expanded</div>
+      <div class="ui-mock">
+        <div class="ui-titlebar">
+          <div class="ui-dot" style="background:#f43f5e;"></div>
+          <div class="ui-dot" style="background:#fbbf24;"></div>
+          <div class="ui-dot" style="background:#10b981;"></div>
+          <div class="ui-url">localhost:3000 · 8 tracks · 32:17 / 60:00 limit</div>
+        </div>
+        <div class="ui-body">
+          <!-- Track 1 playing -->
+          <div class="ui-track-row playing">
+            <div class="ui-track-num" style="color:var(--wave1);">♪</div>
+            <div class="ui-track-thumb">🎵</div>
+            <div>
+              <div class="ui-track-title" style="color:var(--wave1);">Maari Thara Local</div>
+              <div class="ui-track-sub">Dhanush · Maari · 2015</div>
+            </div>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:4px;border:1px solid rgba(249,115,22,.3);color:var(--wave3);background:rgba(249,115,22,.07);">TA</span>
+            <div style="font-size:13px;color:var(--wave2);opacity:.9;cursor:pointer;">🎬</div>
+            <div class="ui-track-dur">3:42</div>
+          </div>
+          <!-- Film panel expanded -->
+          <div class="film-panel">
+            <div>
+              <div class="film-label">Film</div>
+              <div class="film-val" style="font-weight:600;">Maari (2015)<span class="imdb-badge">IMDb ↗</span></div>
+            </div>
+            <div>
+              <div class="film-label">Director</div>
+              <div class="film-val">Balaji Mohan</div>
+            </div>
+            <div>
+              <div class="film-label">Cast</div>
+              <div class="film-val">Dhanush · Kajal Aggarwal · Robo Shankar · Vijay Yesudas</div>
+            </div>
+          </div>
+          <!-- Track 2 -->
+          <div class="ui-track-row">
+            <div class="ui-track-num">2</div>
+            <div class="ui-track-thumb">🎵</div>
+            <div>
+              <div class="ui-track-title">Nee Mattum</div>
+              <div class="ui-track-sub">Haricharan · Maari · 2015</div>
+            </div>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:4px;border:1px solid rgba(249,115,22,.3);color:var(--wave3);background:rgba(249,115,22,.07);">TA</span>
+            <div style="font-size:13px;color:var(--muted);cursor:pointer;">🎬</div>
+            <div class="ui-track-dur">4:51</div>
+          </div>
+          <!-- Track 3 -->
+          <div class="ui-track-row">
+            <div class="ui-track-num">3</div>
+            <div class="ui-track-thumb">🎵</div>
+            <div>
+              <div class="ui-track-title">Un Mela Oru Kannu</div>
+              <div class="ui-track-sub">Tanvi Shah · Maari · 2015</div>
+            </div>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:4px;border:1px solid rgba(249,115,22,.3);color:var(--wave3);background:rgba(249,115,22,.07);">TA</span>
+            <div style="font-size:13px;color:var(--muted);cursor:pointer;">🎬</div>
+            <div class="ui-track-dur">3:58</div>
+          </div>
+          <!-- Track 4 -->
+          <div class="ui-track-row">
+            <div class="ui-track-num">4</div>
+            <div class="ui-track-thumb">🎵</div>
+            <div>
+              <div class="ui-track-title">Munbe Vaa</div>
+              <div class="ui-track-sub">Shreya Ghoshal · Sillunu Oru Kaadhal · 2006</div>
+            </div>
+            <span style="font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:4px;border:1px solid rgba(249,115,22,.3);color:var(--wave3);background:rgba(249,115,22,.07);">TA</span>
+            <div style="font-size:13px;color:var(--muted);cursor:pointer;">🎬</div>
+            <div class="ui-track-dur">5:28</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 05 QDRANT SCHEMA ══ -->
+<div>
+  <div class="sec">05 — Qdrant Document Schema · per track</div>
+  <div class="card" style="padding:26px 30px;">
+    <div class="card-accent acc-indigo"></div>
+    <div class="g2" style="gap:28px;">
+
+      <!-- Left: Schema -->
+      <div>
+        <div class="card-title">Vector Payload</div>
+        <div class="card-sub s-indigo">Stored alongside dual vectors in Qdrant</div>
+        <div class="schema-pre">{
   <span style="color:var(--wave1);">"id"</span>: <span style="color:var(--wave4);">"md5(file_path)"</span>,
 
   <span style="color:var(--wave6);">// Universal fields</span>
   <span style="color:var(--wave1);">"title"</span>:        <span style="color:var(--wave4);">"Munbe Vaa"</span>,
   <span style="color:var(--wave1);">"artist"</span>:       <span style="color:var(--wave4);">"Shreya Ghoshal"</span>,
   <span style="color:var(--wave1);">"album"</span>:        <span style="color:var(--wave4);">"Sillunu Oru Kaadhal"</span>,
-  <span style="color:var(--wave1);">"year"</span>:         <span style="color:var(--wave4);">"2006"</span>,
-  <span style="color:var(--wave1);">"duration"</span>:     <span style="color:#f8fafc;">312</span>,
-  <span style="color:var(--wave1);">"mbid"</span>:         <span style="color:var(--wave4);">"uuid-from-musicbrainz"</span>,
+  <span style="color:var(--wave1);">"year"</span>:         <span style="color:var(--wave4);">"2006"</span>,  <span style="color:var(--muted);">// string for MatchAny range</span>
+  <span style="color:var(--wave1);">"duration"</span>:     <span style="color:#f8fafc;">312</span>,       <span style="color:var(--muted);">// int seconds</span>
+  <span style="color:var(--wave1);">"genre"</span>:        <span style="color:var(--wave4);">"Melody"</span>,
 
   <span style="color:var(--wave6);">// Audio features</span>
   <span style="color:var(--wave1);">"tempo"</span>:        <span style="color:#f8fafc;">68.4</span>,
@@ -1290,48 +1236,152 @@ body::before {
     <span style="color:var(--wave1);">"composer"</span>:    <span style="color:var(--wave4);">"AR Rahman"</span>,
     <span style="color:var(--wave1);">"film_name"</span>:   <span style="color:var(--wave4);">"Sillunu Oru Kaadhal"</span>,
     <span style="color:var(--wave1);">"tamil_genre"</span>: <span style="color:var(--wave4);">"melody"</span>,
-    <span style="color:var(--wave1);">"lyricist"</span>:    <span style="color:var(--wave4);">"Yugabharathi"</span>
+    <span style="color:var(--wave1);">"lyricist"</span>:    <span style="color:var(--wave4);">"Yugabharathi"</span>,
+
+    <span style="color:var(--wave8);">// TMDB enrichment · NEW</span>
+    <span style="color:var(--wave8);">"film_meta"</span>: {
+      <span style="color:var(--wave8);">"director"</span>: <span style="color:var(--wave4);">"Vikraman"</span>,
+      <span style="color:var(--wave8);">"cast"</span>:     <span style="color:var(--wave4);">["Suriya", "Jyothika", "Bhoomika", "Sathyaraj"]</span>,
+      <span style="color:var(--wave8);">"imdb_id"</span>:  <span style="color:var(--wave4);">"tt0443574"</span>,
+      <span style="color:var(--wave8);">"imdb_url"</span>: <span style="color:var(--wave4);">"https://www.imdb.com/title/tt0443574/"</span>
+    }
   },
 
   <span style="color:var(--wave6);">// Semantic content</span>
-  <span style="color:var(--wave1);">"description"</span>: <span style="color:var(--wave4);">"AR Rahman composition..."</span>,
-  <span style="color:var(--wave1);">"lyrics"</span>:      <span style="color:var(--wave4);">"first 300 chars..."</span>,
-  <span style="color:var(--wave1);">"subsonic_id"</span>: <span style="color:var(--wave4);">"navidrome track id"</span>
-}</pre>
+  <span style="color:var(--wave1);">"description"</span>: <span style="color:var(--wave4);">"AR Rahman composition…"</span>,
+  <span style="color:var(--wave1);">"lyrics"</span>:      <span style="color:var(--wave4);">"first 300 chars…"</span>,
+  <span style="color:var(--wave1);">"subsonic_id"</span>: <span style="color:var(--wave4);">"navidrome-track-id"</span>
+}</div>
+      </div>
+
+      <!-- Right: Dual vector + indexes -->
+      <div>
+        <div class="card-title">Dual Vector Strategy</div>
+        <div class="card-sub s-indigo">Two collections · merged at query time</div>
+        <div class="items" style="margin-top:4px;">
+          <div class="item" style="flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="item-icon">📝</div>
+              <div class="item-name">Text RAG Collection — 384-dim</div>
+            </div>
+            <div class="item-desc" style="margin:0;">all-MiniLM-L6-v2<br>embeds: title + artist + composer + genre + tempo_label + mood_label + description + lyrics<br><strong style="color:#94a3b8;">strength: cultural context, lyrics meaning, composer knowledge</strong></div>
+          </div>
+          <div class="item" style="flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="item-icon">🎧</div>
+              <div class="item-name">CLAP Audio Collection — 512-dim</div>
+            </div>
+            <div class="item-desc" style="margin:0;">DCLAP (distilled) · raw waveform (30s)<br><strong style="color:#94a3b8;">strength: zero-tag files · pure sonic · unknown language fallback</strong></div>
+          </div>
+          <div class="item" style="background:rgba(14,165,233,.06);border-color:rgba(14,165,233,.2);">
+            <div class="item-icon">⚖️</div>
+            <div>
+              <div class="item-name" style="color:var(--wave1);">Merge Formula</div>
+              <div class="item-desc">final = 0.6 × text + 0.4 × CLAP<br>Tamil: 0.7/0.3 · Unknown: 0.3/0.7</div>
+            </div>
           </div>
         </div>
-        <div>
-          <div class="card-title">Dual Vector Strategy</div>
-          <div class="card-sub s-indigo">Two collections, merged at query time</div>
-          <div class="items" style="margin-top:4px;">
-            <div class="item" style="flex-direction:column;gap:8px;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div class="item-icon">📝</div>
-                <div class="item-name">Text RAG Collection</div>
-              </div>
-              <div class="item-desc" style="margin:0;">384-dim · all-MiniLM-L6-v2<br>embeds: title + artist + composer + genre + tempo_label + mood_label + description + lyrics<br>strength: cultural context, lyrics meaning, composer knowledge</div>
+
+        <div style="margin-top:18px;background:var(--dim);border-radius:10px;border:1px solid rgba(52,211,153,.2);padding:14px 16px;">
+          <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--wave8);margin-bottom:10px;">Payload Indexes · Required for MatchText · New</div>
+          <div style="margin-bottom:8px;">
+            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:5px;">TEXT INDEX (word tokenizer · MatchText)</div>
+            <div class="hint-grid">
+              <span class="hint-pill t-teal">cultural_meta.film_name</span>
+              <span class="hint-pill t-teal">cultural_meta.lyricist</span>
+              <span class="hint-pill t-teal">cultural_meta.composer</span>
+              <span class="hint-pill t-teal">cultural_meta.film_meta.cast</span>
+              <span class="hint-pill t-teal">artist</span>
+              <span class="hint-pill t-teal">lyrics</span>
             </div>
-            <div class="item" style="flex-direction:column;gap:8px;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div class="item-icon">🎧</div>
-                <div class="item-name">CLAP Audio Collection</div>
-              </div>
-              <div class="item-desc" style="margin:0;">512-dim · DCLAP (distilled)<br>embeds: raw audio waveform (30s)<br>strength: works with zero tags, pure sonic similarity, unknown language fallback</div>
-            </div>
-            <div class="item" style="background:rgba(14,165,233,0.06);border-color:rgba(14,165,233,0.2);">
-              <div class="item-icon">⚖️</div>
-              <div class="item-body">
-                <div class="item-name" style="color:var(--wave1);">Merge Formula</div>
-                <div class="item-desc">final_score = 0.6 × text_score + 0.4 × clap_score<br>weights tunable per language adapter<br>Tamil: 0.7/0.3 (tags reliable)<br>Unknown: 0.3/0.7 (CLAP dominant)</div>
-              </div>
+          </div>
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:5px;">KEYWORD INDEX (MatchAny)</div>
+            <div class="hint-grid">
+              <span class="hint-pill t-indigo">adapter_type</span>
+              <span class="hint-pill t-indigo">year</span>
+              <span class="hint-pill t-indigo">genre</span>
+              <span class="hint-pill t-indigo">key</span>
+              <span class="hint-pill t-indigo">cultural_meta.tamil_genre</span>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
+
+<!-- ══ 06 INFRASTRUCTURE ══ -->
+<div>
+  <div class="sec">06 — Infrastructure · docker-compose</div>
+  <div class="card" style="padding:24px 30px;">
+    <div class="card-accent acc-multi"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div>
+        <div class="card-title">All Services</div>
+        <div class="card-sub" style="color:var(--muted);">Docker Compose · GPU passthrough · nvidia-container-toolkit</div>
+      </div>
+      <div class="tags" style="margin:0;">
+        <span class="tag t-blue">CUDA 12</span>
+        <span class="tag t-blue">4060 Ti 16GB</span>
+        <span class="tag t-blue">nvidia-container-toolkit</span>
+      </div>
+    </div>
+    <div class="g5" style="grid-template-columns:repeat(5,1fr);">
+      <div class="infra-block">
+        <div class="infra-name" style="color:var(--wave4);">navidrome</div>
+        <div class="infra-port">:4533</div>
+        <div class="infra-detail">deluan/navidrome:latest<br>./music:/music:ro<br>navidrome_data:/data<br>Subsonic API</div>
+      </div>
+      <div class="infra-block">
+        <div class="infra-name" style="color:var(--wave2);">qdrant</div>
+        <div class="infra-port">:6333</div>
+        <div class="infra-detail">qdrant/qdrant:latest<br>qdrant_data:/qdrant/storage<br>text 384d + CLAP 512d<br>payload indexes</div>
+      </div>
+      <div class="infra-block">
+        <div class="infra-name" style="color:var(--wave2);">ollama</div>
+        <div class="infra-port">:11434</div>
+        <div class="infra-detail">ollama/ollama:latest<br>GPU: nvidia · all<br>gemma2:9b<br>healthcheck ✓</div>
+      </div>
+      <div class="infra-block" style="border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.04);">
+        <div class="infra-name" style="color:var(--wave8);">ollama-init <span class="tag-new">new</span></div>
+        <div class="infra-port">one-shot</div>
+        <div class="infra-detail">ollama/ollama:latest<br>waits: service_healthy<br>pulls ${OLLAMA_MODEL}<br>auto on first start</div>
+      </div>
+      <div class="infra-block">
+        <div class="infra-name" style="color:var(--wave3);">indexer</div>
+        <div class="infra-port">one-shot / watch</div>
+        <div class="infra-detail">build: ./indexer<br>./music:/music:ro<br>CUDA_VISIBLE=""<br>(CPU mode torch)</div>
+      </div>
+      <div class="infra-block">
+        <div class="infra-name" style="color:var(--wave1);">api</div>
+        <div class="infra-port">:8000</div>
+        <div class="infra-detail">build: ./api<br>env_file: .env<br>JWT auth<br>deps: qdrant, nav, ollama</div>
+      </div>
+      <div class="infra-block">
+        <div class="infra-name" style="color:var(--wave3);">redis</div>
+        <div class="infra-port">:6379</div>
+        <div class="infra-detail">redis:alpine<br>RQ job queue<br>4 indexer workers<br>batch file drops</div>
+      </div>
+      <div class="infra-block">
+        <div class="infra-name" style="color:var(--wave6);">frontend</div>
+        <div class="infra-port">:3000</div>
+        <div class="infra-detail">build: ./frontend<br>React + Vite<br>6 themes<br>depends: api</div>
+      </div>
+      <div class="infra-block">
+        <div class="infra-name" style="color:var(--wave7);">postgres</div>
+        <div class="infra-port">:5432</div>
+        <div class="infra-detail">postgres:15-alpine<br>index metadata<br>job history<br>pg_data volume</div>
+      </div>
+      <div class="infra-block" style="border-color:rgba(14,165,233,.3);background:rgba(14,165,233,.04);">
+        <div class="infra-name" style="color:var(--wave1);">VRAM Budget</div>
+        <div class="infra-port">4060 Ti · 16GB</div>
+        <div class="infra-detail">Gemma2:9b: ~9GB<br>CLAP + sent-tr: ~2GB<br>Qdrant HNSW: ~1GB<br>Headroom: ~4GB ✓</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </div><!-- /page -->
-
 </body>
 </html>

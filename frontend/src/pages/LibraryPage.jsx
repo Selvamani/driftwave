@@ -26,13 +26,17 @@ export default function LibraryPage() {
 
   function toPlayerTrack(song) {
     return {
-      subsonic_id: song.id,            // kept for lyrics lookup
-      file_path:   `${API}/stream/${song.id}`,
-      title:       song.title,
-      artist:      song.artist,
-      album:       song.album,
-      duration:    song.duration,
-      cover_url:   song.coverArt ? `${API}/stream/cover/${song.coverArt}` : null,
+      subsonic_id:   song.id,
+      file_path:     `${API}/stream/${song.id}`,
+      title:         song.title,
+      artist:        song.artist,
+      album:         song.album,
+      duration:      song.duration,
+      cover_url:     song.coverArt ? `${API}/stream/cover/${song.coverArt}` : null,
+      // preserve metadata for sidebar display
+      adapter_type:  song.adapter_type,
+      tempo:         song.tempo,
+      cultural_meta: song.cultural_meta,
     };
   }
 
@@ -86,10 +90,109 @@ export default function LibraryPage() {
         />
       </div>
 
+      {/* Search results */}
+      {search.length > 2 && (
+        <div>
+          {!searchResults && (
+            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--dw-muted)", padding: "12px 0" }}>
+              Searching…
+            </div>
+          )}
+          {searchResults && (
+            <>
+              {searchResults.artists?.length > 0 && (
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: 3, textTransform: "uppercase", color: "var(--dw-muted)", marginBottom: 12 }}>
+                    Artists
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
+                    {searchResults.artists.map((artist) => (
+                      <div
+                        key={artist.id}
+                        onClick={() => { setSearch(""); setSelectedArtist(artist); setSelectedAlbum(null); }}
+                        style={{ background: "var(--dw-card)", border: "1px solid var(--dw-border)", borderRadius: 14, overflow: "hidden", cursor: "pointer" }}
+                        onMouseEnter={(e) => e.currentTarget.style.borderColor = "var(--dw-border2)"}
+                        onMouseLeave={(e) => e.currentTarget.style.borderColor = "var(--dw-border)"}
+                      >
+                        <div style={{ height: 80, background: "var(--dw-surface)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                          <CoverArt id={artist.coverArt} size={160} />
+                        </div>
+                        <div style={{ padding: "9px 12px" }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--dw-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{artist.name}</div>
+                          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--dw-muted)", marginTop: 2 }}>{artist.albumCount} albums</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {searchResults.albums?.length > 0 && (
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: 3, textTransform: "uppercase", color: "var(--dw-muted)", marginBottom: 12 }}>
+                    Albums
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
+                    {searchResults.albums.map((album) => (
+                      <div
+                        key={album.id}
+                        onClick={() => { setSearch(""); setSelectedArtist({ id: album.artistId, name: album.artist }); setSelectedAlbum(album); }}
+                        style={{ background: "var(--dw-card)", border: "1px solid var(--dw-border)", borderRadius: 14, overflow: "hidden", cursor: "pointer" }}
+                        onMouseEnter={(e) => e.currentTarget.style.borderColor = "var(--dw-border2)"}
+                        onMouseLeave={(e) => e.currentTarget.style.borderColor = "var(--dw-border)"}
+                      >
+                        <div style={{ height: 80, background: "var(--dw-surface)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                          <CoverArt id={album.coverArt} size={160} fallback="💿" fontSize={32} />
+                        </div>
+                        <div style={{ padding: "9px 12px" }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--dw-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{album.name}</div>
+                          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--dw-muted)", marginTop: 2 }}>{album.artist}{album.year ? ` · ${album.year}` : ""}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {searchResults.songs?.length > 0 && (
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, letterSpacing: 3, textTransform: "uppercase", color: "var(--dw-muted)", marginBottom: 12 }}>
+                    Songs
+                  </div>
+                  {searchResults.songs.map((song, i) => (
+                    <div
+                      key={song.id}
+                      onClick={() => playTrack(toPlayerTrack(song), searchResults.songs.map(toPlayerTrack))}
+                      style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 12px", borderRadius: 10, cursor: "pointer", background: i % 2 === 0 ? "var(--dw-card)" : "transparent", transition: "background 0.15s" }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = "var(--dw-surface)"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = i % 2 === 0 ? "var(--dw-card)" : "transparent"}
+                    >
+                      <div style={{ width: 36, height: 36, borderRadius: 6, background: "var(--dw-surface)", overflow: "hidden", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <CoverArt id={song.coverArt} size={72} fallback="🎵" fontSize={18} />
+                      </div>
+                      <div style={{ flex: 1, overflow: "hidden" }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--dw-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{song.title}</div>
+                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "var(--dw-muted)", marginTop: 2 }}>{song.artist} · {song.album}</div>
+                      </div>
+                      <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "var(--dw-muted)", flexShrink: 0 }}>
+                        {song.duration ? `${Math.floor(song.duration / 60)}:${String(song.duration % 60).padStart(2, "0")}` : ""}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {!searchResults.artists?.length && !searchResults.albums?.length && !searchResults.songs?.length && (
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "var(--dw-muted)", padding: "12px 0" }}>
+                  No results for "{search}"
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
       {/* Back button when artist selected */}
-      {selectedArtist && (
+      {!search && selectedArtist && (
         <button
-          onClick={() => setSelectedArtist(null)}
+          onClick={() => { setSelectedArtist(null); setSelectedAlbum(null); }}
           style={{
             background: "none", border: "none", cursor: "pointer",
             color: "var(--dw-accent)", fontFamily: "'Syne', sans-serif",
@@ -100,7 +203,8 @@ export default function LibraryPage() {
         </button>
       )}
 
-      {/* Artists grid */}
+      {/* Artists grid — hidden once an artist is selected */}
+      {!selectedArtist && <>
       <div style={{
         fontFamily: "'DM Mono', monospace", fontSize: 9,
         letterSpacing: 3, textTransform: "uppercase",
@@ -148,6 +252,7 @@ export default function LibraryPage() {
           </div>
         ))}
       </div>
+      </>}
       {/* Albums panel */}
       {selectedArtist && (
         <div>
@@ -156,45 +261,57 @@ export default function LibraryPage() {
             letterSpacing: 3, textTransform: "uppercase",
             color: "var(--dw-muted)", marginBottom: 14,
           }}>{selectedArtist.name} — Albums</div>
-          <div style={{
-            display: "grid", gridTemplateColumns: "repeat(4,1fr)",
-            gap: 14, marginBottom: 32,
-          }}>
-            {(albums || Array(4).fill(null)).map((album, i) => (
-              <div
-                key={i}
-                onClick={() => album && setSelectedAlbum(selectedAlbum?.id === album.id ? null : album)}
-                style={{
-                  background: selectedAlbum?.id === album?.id ? "var(--dw-surface)" : "var(--dw-card)",
-                  border: `1px solid ${selectedAlbum?.id === album?.id ? "var(--dw-accent)" : "var(--dw-border)"}`,
-                  borderRadius: 14, overflow: "hidden", cursor: "pointer",
-                  transition: "border-color 0.2s, background 0.2s",
-                }}
-              >
-                <div style={{
-                  height: 100, background: "var(--dw-surface)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  overflow: "hidden",
-                }}>
-                  <CoverArt id={album?.coverArt} size={200} fallback="💿" fontSize={36} />
-                </div>
-                <div style={{ padding: "10px 12px" }}>
+          {!selectedAlbum && (
+            <div style={{
+              display: "grid", gridTemplateColumns: "repeat(4,1fr)",
+              gap: 14, marginBottom: 32,
+            }}>
+              {(albums || Array(4).fill(null)).map((album, i) => (
+                <div
+                  key={i}
+                  onClick={() => album && setSelectedAlbum(album)}
+                  style={{
+                    background: "var(--dw-card)",
+                    border: "1px solid var(--dw-border)",
+                    borderRadius: 14, overflow: "hidden", cursor: "pointer",
+                    transition: "border-color 0.2s, background 0.2s",
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.borderColor = "var(--dw-border2)"}
+                  onMouseLeave={(e) => e.currentTarget.style.borderColor = "var(--dw-border)"}
+                >
                   <div style={{
-                    fontSize: 13, fontWeight: 700, color: "var(--dw-text)",
-                    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                  }}>{album?.name || "—"}</div>
-                  <div style={{
-                    fontFamily: "'DM Mono', monospace", fontSize: 9,
-                    color: "var(--dw-muted)", marginTop: 2,
-                  }}>{album?.year || ""}</div>
+                    height: 100, background: "var(--dw-surface)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    overflow: "hidden",
+                  }}>
+                    <CoverArt id={album?.coverArt} size={200} fallback="💿" fontSize={36} />
+                  </div>
+                  <div style={{ padding: "10px 12px" }}>
+                    <div style={{
+                      fontSize: 13, fontWeight: 700, color: "var(--dw-text)",
+                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                    }}>{album?.name || "—"}</div>
+                    <div style={{
+                      fontFamily: "'DM Mono', monospace", fontSize: 9,
+                      color: "var(--dw-muted)", marginTop: 2,
+                    }}>{album?.year || ""}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
         {/* Tracks panel */}
         {selectedAlbum && (
           <div>
+            <button
+              onClick={() => setSelectedAlbum(null)}
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                color: "var(--dw-accent)", fontFamily: "'Syne', sans-serif",
+                fontSize: 13, marginBottom: 16, padding: 0,
+              }}
+            >← Albums</button>
             <div style={{
               fontFamily: "'DM Mono', monospace", fontSize: 9,
               letterSpacing: 3, textTransform: "uppercase",

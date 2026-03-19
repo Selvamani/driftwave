@@ -25,6 +25,10 @@ It understands the cultural context of your music — composer signatures, film 
 
 For full architecture details, see [SystemDesign.md](SystemDesign.md).
 
+| Web | Mobile |
+|:---:|:---:|
+| ![Driftwave web app](docs/web-view.png) | ![Driftwave mobile app](docs/mobile.png) |
+
 ---
 
 ## How It Works
