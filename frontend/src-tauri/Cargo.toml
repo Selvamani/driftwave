@@ -1,0 +1,23 @@
+[package]
+name = "driftwave"
+version = "1.0.0"
+description = "Driftwave — self-hosted AI music player"
+authors = ["Driftwave Contributors"]
+edition = "2021"
+
+[lib]
+name = "driftwave_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "driftwave"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri       = { version = "2", features = [] }
+tauri-plugin-opener = { version = "2" }
+serde       = { version = "1", features = ["derive"] }
+serde_json  = "1"

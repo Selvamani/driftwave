@@ -6,7 +6,9 @@ import LibraryPage     from "./pages/LibraryPage";
 import PlaylistsPage   from "./pages/PlaylistsPage";
 import SettingsPage    from "./pages/SettingsPage";
 import NowPlayingPage  from "./pages/NowPlayingPage";
+import SetupPage       from "./pages/SetupPage";
 import usePlayerStore from "./hooks/usePlayerStore";
+import { needsFirstRunSetup } from "./services/config";
 
 function AudioEngine() {
   const audioRef = useRef(new Audio());
@@ -63,10 +65,16 @@ function AudioEngine() {
 }
 
 export default function App() {
+  // In Tauri desktop: redirect to setup if no server URL has been configured yet
+  if (needsFirstRunSetup()) {
+    return <SetupPage />;
+  }
+
   return (
     <>
       <AudioEngine />
       <Routes>
+        <Route path="/setup" element={<SetupPage />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/discover" replace />} />
           <Route path="discover"    element={<DiscoverPage />} />
