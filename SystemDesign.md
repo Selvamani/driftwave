@@ -137,17 +137,19 @@ Step 01  User Prompt
          natural language or mood sliders
 
 Step 02  Tag Extraction  (Ollama · Gemma2:9b)
-         12 hint types extracted:
+         13 hint types extracted:
          ┌────────────────────────────────────────────────────┐
          │ composer_hints  film_hints     year_from / year_to │
          │ artist_hints    cast_hints     genre_hints         │
-         │ tamil_genre_hints              valence             │
+         │ director_hints  tamil_genre_hints  valence         │
          │ duration_min / duration_max    key_hint            │
          │ lyrics_hint    is_film_song                        │
          └────────────────────────────────────────────────────┘
+         Name expansion: "rajini" → Rajinikanth · "maniratnam" → Mani Ratnam
+                         "arr" → A.R. Rahman · "anirudh" → Anirudh Ravichander
 
 Step 03  Build Qdrant Filters
-         MatchText → film_name · lyricist · composer · cast · lyrics · artist
+         MatchText → film_name · lyricist · composer · cast · director · lyrics · artist
          MatchAny  → year (string field, range expanded to list)
                      genre · tamil_genre · adapter_type
          Range     → tempo · energy · valence · duration
@@ -195,7 +197,7 @@ Two index types are created at `init_collections()`:
 
 | Type | Fields |
 |---|---|
-| `TextIndexParams` (word tokenizer) | `cultural_meta.film_name` · `cultural_meta.lyricist` · `cultural_meta.composer` · `cultural_meta.film_meta.cast` · `artist` · `lyrics` |
+| `TextIndexParams` (word tokenizer) | `cultural_meta.film_name` · `cultural_meta.lyricist` · `cultural_meta.composer` · `cultural_meta.film_meta.cast` · `cultural_meta.film_meta.director` · `artist` · `lyrics` |
 | `KEYWORD` | `adapter_type` · `year` · `genre` · `key` · `cultural_meta.tamil_genre` |
 
 > `MatchText` requires a TextIndexParams index — without it Qdrant silently ignores the filter.
@@ -392,32 +394,41 @@ Six themes ship for web and mobile: `ocean` · `aurora` · `sunset` · `midnight
 
 ### Bugs / Correctness
 
-| Issue | Impact | Notes |
-|---|---|---|
-| **Year filter returns 0 results** ("before 2000", "after 2000") | High | `year` stored as string; range filter may need int cast or MatchAny expansion |
-| **Tamil tracks in Roman script misdetected as English** | High | Raattinam and similar albums; fasttext lid.176 struggles with romanised Tamil. Add artist-DB or folder-hint pass before fasttext |
-| **Audio features unreliable** | Medium | librosa energy=1.0 on ballads, repeated tempo values. Consider replacing with Essentia or Madmom for BPM, or post-processing to clamp outliers |
-| **Tamil genre always "melody"** | Medium | Downstream of audio features bug; kuthu/gaana not detected without valid energy/tempo |
-| **CLAP dual-search not wired** | Medium | `AUDIO_COLLECTION` exists in Qdrant but `api/core/retriever.py` only queries text collection. Wire parallel CLAP search and merge scores |
-| **AcoustID not wired** | Low | `pyacoustid` in requirements, fingerprinting code present in indexer but not invoked in the main pipeline |
+| Issue | Impact | Status | Notes |
+|---|---|---|---|
+| **Year filter returns 0 results** ("before 2000", "after 2000") | High | Open | `year` stored as string; MatchAny expansion implemented but untested at scale |
+| **Tamil tracks in Roman script misdetected as English** | High | Open | Raattinam and similar albums; fasttext lid.176 struggles with romanised Tamil. Add artist-DB or folder-hint pass before fasttext |
+| **Audio features unreliable** | Medium | Open | librosa energy=1.0 on ballads, repeated tempo values. Consider replacing with Essentia or Madmom for BPM |
+| **Tamil genre always "melody"** | Medium | Open | Downstream of audio features bug; kuthu/gaana not detected without valid energy/tempo |
+| **CLAP dual-search not wired** | Medium | Open | `AUDIO_COLLECTION` exists in Qdrant but retriever only queries text collection |
+| **AcoustID not wired** | Low | Open | `pyacoustid` in requirements, fingerprinting code present but not invoked in pipeline |
+| **"rajini songs" / "maniratnam songs" poor results** | High | Fixed | Added `director_hints` field + Qdrant index; LLM prompt now expands colloquial names (rajini→Rajinikanth, maniratnam→Mani Ratnam, arr→A.R. Rahman, etc.) |
 
 ### Features
 
-| Feature | Notes |
-|---|---|
-| **Playlist push to Navidrome** | `/playlist/push` endpoint exists; web UI has no "Save playlist" button yet |
-| **Offline mode / PWA** | Service worker + cache for web; already works offline in Tauri desktop |
-| **MusicBrainz enrichment** | Wire AcoustID → MusicBrainz lookup for untagged files (MBID, release year, genre) |
-| **Malayalam / Japanese adapters** | Registered in adapter table but implementation depth varies — verify enrich() coverage |
-| **Lyrics sync (LRC timestamps)** | Lyrics are fetched but displayed as plain text; add scrolling karaoke-style display |
-| **Re-index single track** | Watch mode re-indexes new files; add API endpoint to force re-index a specific path |
-| **Android / iOS build pipeline** | Flutter code complete; CI pipeline and signing not set up |
-| **Tauri auto-update** | Tauri updater plugin not configured; add for Windows/macOS distribution |
+| Feature | Status | Notes |
+|---|---|---|
+| **Playlist push to Navidrome** | Open | `/playlist/push` endpoint exists; web UI has no "Save playlist" button yet |
+| **Offline mode / PWA** | Partial | Already works offline in Tauri desktop; service worker not added for web |
+| **MusicBrainz enrichment** | Open | Wire AcoustID → MusicBrainz lookup for untagged files (MBID, release year, genre) |
+| **Malayalam / Japanese adapters** | Partial | Registered but implementation depth varies — verify enrich() coverage |
+| **Lyrics sync (LRC timestamps)** | Open | Lyrics fetched and displayed as plain text; karaoke-style scrolling not yet added |
+| **Re-index single track** | Open | Watch mode handles new files; no API endpoint to force re-index a specific path |
+| **Android / iOS build pipeline** | Open | Flutter code complete; CI pipeline and app signing not set up |
+| **Tauri auto-update** | Open | Tauri updater plugin not configured; needed for Windows/macOS distribution |
+| **"Save playlist" button (web)** | Open | Discover page has no way to push result playlist to Navidrome from the UI |
 
 ### Performance
 
-| Area | Notes |
-|---|---|
-| **Ollama tag extraction latency** | ~1–2 s per query with Gemma2:9b; evaluate Gemma2:2b or structured output mode |
-| **CLAP indexing speed** | DCLAP processes ~5 songs/s on 4060 Ti; batch size tuning may help |
-| **Qdrant HNSW ef / m tuning** | Default params; tune for recall vs. latency tradeoff at scale (>50k tracks) |
+Current search latency is **3–6 s**, dominated by two sequential Ollama calls (tag extraction + rerank). Planned optimisations in priority order:
+
+| Area | Priority | Approach |
+|---|---|---|
+| **Skip rerank for filtered queries** | High | When `cast_hints` / `director_hints` / `composer_hints` / `film_hints` filters are present, results are already constrained — skip the second Ollama call entirely. Saves ~2–4 s on name/film searches. |
+| **Parallel tag extraction + vector search** | High | Fire broad Qdrant vector search simultaneously with Ollama tag extraction. When tags arrive, filter in-memory. Hides ~1–2 s of LLM latency behind the Qdrant roundtrip. |
+| **Prompt-level LRU cache** | Medium | Cache `(normalised_prompt, filters) → (tags, tracks)` with 5-min TTL. Free win for repeat searches and Discover page re-mounts. |
+| **Score-boost reranking** | Medium | Replace second Ollama rerank call with rule-based score boosts (+0.2 composer match, +0.15 director/cast, +0.1 film name). Deterministic, eliminates second Ollama call entirely. |
+| **Smaller tag extraction model** | Medium | Gemma2:9b is overkill for structured JSON extraction. `gemma2:2b` or `phi3:mini` (3.8B) → ~300–500 ms vs 1–2 s. Keep Gemma2:9b only for rerank. |
+| **Streaming results** | Low | Return vector search results immediately; send reranked order as a follow-up. User sees results in ~500 ms, order refines later. Needs frontend streaming support. |
+| **CLAP indexing speed** | Low | DCLAP processes ~5 songs/s on 4060 Ti; batch size tuning may help. |
+| **Qdrant HNSW ef / m tuning** | Low | Default params; tune for recall vs. latency tradeoff at scale (>50k tracks). |

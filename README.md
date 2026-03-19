@@ -26,9 +26,11 @@ It understands the cultural context of your music — composer signatures, film 
 For full architecture details, see [SystemDesign.md](SystemDesign.md).
 
 **Web**
+
 ![Driftwave web app](docs/web-view.png)
 
 **Mobile**
+
 ![Driftwave mobile app](docs/mobile.png)
 
 ---
@@ -88,6 +90,9 @@ TMDB integration enriches film songs with director, top cast, and IMDb links —
 
 **Dual-vector retrieval**
 Text embeddings carry cultural context and lyrics meaning. CLAP audio embeddings handle zero-tag files by sonic similarity. Both are merged at query time.
+
+**Search latency**
+Current: 3–6 s (two Ollama calls — tag extraction + rerank). Planned: parallel vector search, skip rerank for filtered queries, prompt cache, score-boost reranking. See [SystemDesign.md](SystemDesign.md) for the full performance roadmap.
 
 **Duration-aware playlists**
 Limit results by total playlist duration (e.g., "give me 300 minutes of 90s melodies") or by count. Mutually exclusive in the UI.

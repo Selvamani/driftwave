@@ -145,3 +145,30 @@ Navidrome's `search3` response returns singular keys (`artist`, `album`, `song`)
 Six themes ship for both web and mobile: `ocean`, `aurora`, `sunset`, `midnight`, `sakura`, `paper`.
 - Web: Settings → Appearance
 - Mobile: Settings → Theme
+
+## CORS
+
+The API (`api/main.py`) uses `allow_origins=["*"]` with `allow_credentials=False`. Open CORS — any origin can call the API. Do not set `allow_credentials=True` with a wildcard origin; browsers block it.
+
+## RAG Search — Tag Extraction
+
+`api/core/retriever.py` contains `TAG_EXTRACTION_PROMPT` which the LLM uses to extract structured hints from natural language queries. Key points:
+
+- **13 hint types** including `director_hints` (added for "maniratnam songs"-style queries)
+- The prompt includes **name expansion rules** for colloquial South Indian names:
+  - "rajini" → Rajinikanth (`cast_hints`)
+  - "maniratnam" → Mani Ratnam (`director_hints`)
+  - "arr" → A.R. Rahman (`composer_hints`)
+  - "anirudh" → Anirudh Ravichander, etc.
+- When adding a new hint type: add it to `TAG_EXTRACTION_PROMPT`, add a filter in `build_filters()`, and add a Qdrant payload index in `indexer/embedder.py` `_TEXT_INDEX_FIELDS` or `_KEYWORD_INDEX_FIELDS`.
+- `MatchText` requires a `TextIndexParams` index — without it Qdrant silently ignores the filter.
+- Score threshold drops to `0.10` (from `0.30`) when hard filters are present, since filters already constrain relevance.
+
+## Search Performance
+
+Current search takes 3–6 s due to two sequential Ollama calls. Do not add more Ollama calls to the hot path. Planned fixes (not yet implemented — see SystemDesign.md §10 Performance):
+1. Skip LLM rerank when hard filters are active (cast/director/composer/film) — saves 2–4 s
+2. Parallel tag extraction + broad vector search — hides 1–2 s of LLM latency
+3. Prompt LRU cache — free win for repeat searches
+4. Score-boost reranking to replace second Ollama call entirely
+5. Smaller model (gemma2:2b) for tag extraction only

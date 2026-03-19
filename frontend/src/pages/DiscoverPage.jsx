@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import usePlayerStore from "../hooks/usePlayerStore";
 import useDiscoverStore from "../hooks/useDiscoverStore";
+import SearchSuggestions from "../components/SearchSuggestions";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -205,6 +206,55 @@ export default function DiscoverPage() {
   const playTrack    = usePlayerStore((s) => s.playTrack);
   const currentTrack = usePlayerStore((s) => s.currentTrack);
 
+  // ── Suggestions ───────────────────────────────────────
+  const [suggestions,  setSuggestions]  = useState([]);
+  const [suggActive,   setSuggActive]   = useState(-1);
+  const [showSugg,     setShowSugg]     = useState(false);
+  const suggestTimer = useRef(null);
+
+  const fetchSuggestions = useCallback((q) => {
+    clearTimeout(suggestTimer.current);
+    if (q.length < 2) { setSuggestions([]); setShowSugg(false); return; }
+    suggestTimer.current = setTimeout(async () => {
+      try {
+        const res = await axios.get(`${API}/search/suggest`, { params: { q } });
+        setSuggestions(res.data.suggestions || []);
+        setShowSugg(true);
+        setSuggActive(-1);
+      } catch { /* ignore */ }
+    }, 250);
+  }, []);
+
+  const handleSuggSelect = (s) => {
+    setPrompt(s.label);
+    setSuggestions([]);
+    setShowSugg(false);
+  };
+
+  const handlePromptKeyDown = (e) => {
+    if (!showSugg || !suggestions.length) {
+      if (e.key === "Enter") handleSearch();
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSuggActive((i) => Math.min(i + 1, suggestions.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSuggActive((i) => Math.max(i - 1, -1));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (suggActive >= 0) {
+        handleSuggSelect(suggestions[suggActive]);
+      } else {
+        setShowSugg(false);
+        handleSearch();
+      }
+    } else if (e.key === "Escape") {
+      setShowSugg(false);
+    }
+  };
+
   function toPlayerTrack(track) {
     return {
       ...track,
@@ -296,8 +346,19 @@ export default function DiscoverPage() {
         }}>🎵</span>
         <input
           value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          onChange={(e) => { setPrompt(e.target.value); fetchSuggestions(e.target.value); }}
+          onKeyDown={handlePromptKeyDown}
+          onFocus={(e) => {
+            e.target.style.borderColor = "var(--dw-accent)";
+            e.target.style.boxShadow = "0 0 0 3px color-mix(in srgb, var(--dw-accent) 12%, transparent)";
+            if (prompt.length >= 2 && suggestions.length > 0) setShowSugg(true);
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "var(--dw-border2)";
+            e.target.style.boxShadow = "none";
+            // Delay so onMouseDown on suggestion fires first
+            setTimeout(() => setShowSugg(false), 150);
+          }}
           placeholder="e.g. melancholic AR Rahman, late night, slow tempo..."
           style={{
             width: "100%", background: "var(--dw-surface)",
@@ -306,14 +367,6 @@ export default function DiscoverPage() {
             fontFamily: "'Syne', sans-serif", fontSize: 14,
             color: "var(--dw-text)", outline: "none",
             transition: "border-color 0.2s, box-shadow 0.2s",
-          }}
-          onFocus={(e) => {
-            e.target.style.borderColor = "var(--dw-accent)";
-            e.target.style.boxShadow = "0 0 0 3px color-mix(in srgb, var(--dw-accent) 12%, transparent)";
-          }}
-          onBlur={(e) => {
-            e.target.style.borderColor = "var(--dw-border2)";
-            e.target.style.boxShadow = "none";
           }}
         />
         <button
@@ -327,6 +380,14 @@ export default function DiscoverPage() {
             cursor: "pointer", transition: "all 0.2s",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>→</button>
+        {showSugg && (
+          <SearchSuggestions
+            suggestions={suggestions}
+            activeIndex={suggActive}
+            onSelect={handleSuggSelect}
+            onClose={() => setShowSugg(false)}
+          />
+        )}
       </div>
 
       {/* Mood chips */}

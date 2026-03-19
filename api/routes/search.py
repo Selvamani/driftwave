@@ -4,6 +4,7 @@ from fastapi import APIRouter, Query
 from pydantic import BaseModel
 
 from core.retriever import search as rag_search, extract_query_tags
+from core.suggestions import suggest as get_suggestions
 
 router = APIRouter()
 
@@ -71,6 +72,13 @@ async def search(req: SearchRequest):
         total_duration=total_duration,
         extracted_tags=tags,
     )
+
+
+@router.get("/suggest")
+async def suggest(q: str = Query(..., min_length=2, description="Partial query for autocomplete")):
+    """Return name/film suggestions for the given partial query."""
+    results = await get_suggestions(q)
+    return {"suggestions": results, "query": q}
 
 
 @router.get("/debug/tags")

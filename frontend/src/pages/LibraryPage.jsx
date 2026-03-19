@@ -32,6 +32,7 @@ export default function LibraryPage() {
       artist:        song.artist,
       album:         song.album,
       duration:      song.duration,
+      bitRate:       song.bitRate,
       cover_url:     song.coverArt ? `${API}/stream/cover/${song.coverArt}` : null,
       // preserve metadata for sidebar display
       adapter_type:  song.adapter_type,

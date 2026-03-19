@@ -164,9 +164,9 @@ export default function NowPlayingSidebar() {
                   {currentTrack.cultural_meta.tamil_genre.toUpperCase()}
                 </span>
               )}
-              {currentTrack.tempo > 0 && (
+              {currentTrack.bitRate > 0 && (
                 <span className="lang-badge" style={{ color: "var(--dw-muted2)", borderColor: "var(--dw-border2)" }}>
-                  {Math.round(currentTrack.tempo)} kbps
+                  {currentTrack.bitRate} kbps
                 </span>
               )}
             </div>

@@ -108,14 +108,51 @@ services:
       timeout: 5s
       retries: 5
 
-  # ── INDEXER ────────────────────────────────────────────
+  # ── INDEXER (one-shot) ─────────────────────────────────
   indexer:
     build:
       context: ./indexer
       dockerfile: Dockerfile
     image: driftwave-indexer
     container_name: driftwave-indexer
-    restart: "no"             # run manually or via make
+    restart: "no"             # run manually: make index / make reset-index
+    volumes:
+      - /mnt/e/SubsonicMusicRepo:/music:ro
+      - ./indexer:/app
+    environment:
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      OLLAMA_HOST: http://ollama:11434
+      NAVIDROME_URL: http://navidrome:4533
+      NAVIDROME_USER: ${NAVIDROME_USER}
+      NAVIDROME_PASS: ${NAVIDROME_PASS}
+      TMDB_API_KEY: ${TMDB_API_KEY:-}
+      REDIS_URL: redis://redis:6379
+      POSTGRES_URL: postgresql://${POSTGRES_USER:-driftwave}:${POSTGRES_PASSWORD:-driftwave}@postgres:5432/${POSTGRES_DB:-driftwave}
+      MUSIC_DIR: /music
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma2:9b}
+      CUDA_VISIBLE_DEVICES: ""
+    depends_on:
+      - qdrant
+      - ollama
+      - redis
+      - postgres
+    networks:
+      - driftwave
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # ── WATCHER (persistent) ───────────────────────────────
+  watcher:
+    image: driftwave-indexer
+    container_name: driftwave-watcher
+    restart: unless-stopped   # always running — polls /music every 30s
+    command: ["python", "main.py", "watch"]
     volumes:
       - /mnt/e/SubsonicMusicRepo:/music:ro
       - ./indexer:/app

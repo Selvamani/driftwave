@@ -8,7 +8,7 @@ import time
 import threading
 from pathlib import Path
 
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 from watchdog.events import FileSystemEventHandler
 from rich.console import Console
 
@@ -111,7 +111,9 @@ class DriftwaveMusicHandler(FileSystemEventHandler):
 class MusicWatcher:
     def __init__(self, music_dir: str = settings.MUSIC_DIR):
         self.music_dir = music_dir
-        self.observer  = Observer()
+        # PollingObserver works on WSL2 /mnt/ drives where inotify is blind.
+        # poll_interval=30s — low enough to catch new files quickly, low CPU overhead.
+        self.observer  = PollingObserver(timeout=30)
         self.handler   = DriftwaveMusicHandler()
 
     def start(self):

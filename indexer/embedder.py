@@ -75,6 +75,7 @@ _TEXT_INDEX_FIELDS = [
     "cultural_meta.lyricist",
     "cultural_meta.composer",
     "cultural_meta.film_meta.cast",
+    "cultural_meta.film_meta.director",
     "artist",
     "lyrics",
 ]

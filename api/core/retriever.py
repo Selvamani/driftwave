@@ -40,11 +40,99 @@ def get_qdrant():
 # ── Tag extraction ────────────────────────────────────
 
 TAG_EXTRACTION_PROMPT = """\
-You are a music search tag extractor. Extract tags from the user query into JSON.
-Use null for any field not mentioned in the query.
+You are a music search tag extractor for a South Indian (Tamil/Telugu/Hindi/Korean/Arabic) music library.
+Extract tags from the user query into JSON. Use null for any field not mentioned.
 
-Fields:
-- mood: string ("happy", "sad", "melancholic", "energetic", "peaceful", etc.) or null
+IMPORTANT: The user may make spelling mistakes, typos, or use phonetic spellings — always infer the intended name and expand to the canonical form. Be forgiving of extra/missing letters, swapped characters, and alternate transliterations from Tamil/Telugu/Hindi script.
+
+═══ NAME EXPANSION — always use the full canonical name ═══
+(also covers common misspellings and phonetic variants)
+
+ACTORS (→ cast_hints):
+rajini / rajni / rajinee / superstar / thalaivar → Rajinikanth
+kamal / kamaal / kamalhasan / ulaganayagan → Kamal Haasan
+vijay / vijjai / vijay thalapathy / thalapathy → Vijay
+ajith / ajit / ajiths / thala → Ajith Kumar
+dhanush / danush / dhansh → Dhanush
+suriya / surya / suria → Suriya
+vikram / vikrum → Vikram
+simbu / str / silambarasan / silambu → Silambarasan
+sivakarthikeyan / sk / siva karthikeyan / sivakarthik → Sivakarthikeyan
+karthi / karthee → Karthi
+nayanthara / nayantara / nayan → Nayanthara
+trisha / trisha krishnan / trisa → Trisha
+samantha / samanta / samantha ruth → Samantha
+mahesh / mahesh babu / superstar mahesh → Mahesh Babu
+prabhas / prabas → Prabhas
+allu arjun / alluarjun / bunny → Allu Arjun
+jr ntr / ntr / junior ntr / young tiger → Jr. NTR
+ram charan / ramcharan → Ram Charan
+genelia / genilia → Genelia D'Souza
+nithya / nithya menen → Nithya Menen
+
+DIRECTORS (→ director_hints):
+maniratnam / mani ratnam / mani rathnam / manirathnam → Mani Ratnam
+shankar / s shankar / shankaar → Shankar
+atlee / athlee / atlee kumar → Atlee
+lokesh / lokesh kanagaraj / lk / lokesh kangaraj → Lokesh Kanagaraj
+gautham / gautam / gautham menon / gautam menon → Gautham Menon
+vetrimaaran / vetri maaran / vetrimaran → Vetrimaaran
+pa ranjith / paranjith / ranjith → Pa. Ranjith
+bala / bala director → Bala
+selvaraghavan / selva / selvaragavan → Selvaraghavan
+rajiv menon / rajeev menon → Rajiv Menon
+karthik subbaraj / karthick subbaraj → Karthik Subbaraj
+
+COMPOSERS (→ composer_hints):
+arr / rahman / rahmaan / ar rahman / rehman / rehmann / a r rahman → A.R. Rahman
+ilayaraja / ilaiyaraaja / isaignani / ilaiah raja / ilayraaja / ilayaraja → Ilaiyaraaja
+harris / harris jayaraj / harish jayaraj / harris jayraj → Harris Jayaraj
+yuvan / yuvan shankar raja / yuvan shankar / yuvanshankar → Yuvan Shankar Raja
+anirudh / anirudh ravichander / anirud / aniruth → Anirudh Ravichander
+dsp / devi sri prasad / devisriprasad → Devi Sri Prasad
+gv / gv prakash / gvprakash / gv prakash kumar → G.V. Prakash Kumar
+d imman / imman / dimman → D. Imman
+vidyasagar / vidhyasagar → Vidyasagar
+sa rajkumar / sa rajkumaar / sarajkumar → S.A. Rajkumar
+james vasanthan / james → James Vasanthan
+hip hop tamizha / adhi / hiphoptamizha → Hip Hop Tamizha
+thaman / ss thaman / s thaman → S. Thaman
+mani sharma / manisharma → Mani Sharma
+
+SINGERS (→ artist_hints):
+spb / s p balasubrahmanyam / balasubramaniam → S. P. Balasubrahmanyam
+sid sriram / sidsriram / sid → Sid Sriram
+chinmayi / chinmayi sripada → Chinmayi
+shreya / shreya ghoshal / shreya ghosal → Shreya Ghoshal
+karthik / kartik singer → Karthik
+haricharan / hari charan → Haricharan
+benny dayal / beny dayal → Benny Dayal
+andrea / andrea jeremiah → Andrea Jeremiah
+tippu / tipu singer → Tippu
+unnikrishnan / unni krishnan → Unnikrishnan
+naresh iyer / naresh → Naresh Iyer
+sp sailaja / sailaja → S. P. Sailaja
+
+═══ MOOD → AUDIO FEATURE INFERENCE ═══
+When mood words appear, infer the corresponding energy/valence/tempo unless overridden:
+- "sad" / "emotional" / "heartbreak" / "breakup" / "cry" / "melancholic" / "sentimental" → valence: "sad", energy: "low", tempo: "slow"
+- "happy" / "feel good" / "joyful" / "cheerful" / "uplifting" → valence: "happy", energy: "medium"
+- "romantic" / "love" / "soft romantic" → valence: "happy", tempo: "slow", energy: "low"
+- "energetic" / "pump up" / "gym" / "workout" → energy: "high", tempo: "fast"
+- "party" / "dance" / "celebration" / "dance floor" → energy: "high", tempo: "fast"
+- "chill" / "relaxing" / "calm" / "peaceful" / "soothing" → energy: "low", tempo: "slow"
+- "driving" / "road trip" / "cruising" → energy: "medium", tempo: "moderate"
+- "late night" / "midnight" / "3am" → energy: "low", tempo: "slow"
+- "nostalgic" / "throwback" / "old is gold" → mood: "nostalgic", valence: "neutral"
+- "rain" / "monsoon" / "rainy" → valence: "sad", energy: "low", tempo: "slow"
+- "devotional" / "bhakti" / "prayer" → tamil_genre_hints: ["devotional"]
+- "kuthu" / "mass" / "dance number" → tamil_genre_hints: ["kuthu"], energy: "high", tempo: "fast"
+- "folk" / "gaana" → tamil_genre_hints: ["folk", "gaana"]
+- "bgm" / "background" / "instrumental" → tamil_genre_hints: ["bgm"]
+- "classical" / "carnatic" → tamil_genre_hints: ["classical"]
+
+═══ FIELDS ═══
+- mood: descriptive mood string or null
 - tempo: "slow" / "moderate" / "fast" or null
 - energy: "low" / "medium" / "high" or null
 - valence: "happy" / "sad" / "neutral" or null
@@ -52,30 +140,61 @@ Fields:
 - activity: string or null
 - genre_hints: list of genre names or null
 - tamil_genre_hints: list from [kuthu, melody, gaana, folk, bgm, devotional, classical] or null
-- composer_hints: list of composer/music director names or null  (trigger: "composed by", "music by")
-- lyricist_hints: list of lyricist names or null  (trigger: "penned by", "written by", "lyrics by")
-- artist_hints: list of SINGER/VOCALIST names only or null  (trigger: "sung by", "voice of", "playback by")
-- cast_hints: list of ACTOR/ACTRESS names or null  (trigger: "songs of <actor>", "films of <actress>", "starring")
+- composer_hints: list of COMPOSER names or null
+- director_hints: list of FILM DIRECTOR names or null
+- lyricist_hints: list of LYRICIST names or null
+- artist_hints: list of SINGER/VOCALIST names only or null
+- cast_hints: list of ACTOR/ACTRESS names or null
 - film_hints: list of film/movie names or null
-- year_from: integer or null  (trigger: decade like "90s"→1990, specific year)
-- year_to: integer or null    (trigger: decade like "90s"→1999, specific year)
-- duration_min: seconds as integer or null  (trigger: "short songs"→null, "under 3 min"→180)
-- duration_max: seconds as integer or null  (trigger: "long songs"→null, "under 3 min"→180)
-- key_hint: musical key string or null  (trigger: only when key is explicitly stated)
-- is_film_song: true/false/null  (trigger: "film songs"→true, "album songs"→false)
+- year_from: integer or null  ("90s"→1990, "before 2000"→null/year_to:1999, "after 2000"→2000/null)
+- year_to: integer or null
+- duration_min: seconds as integer or null  ("under 3 min"→duration_max:180)
+- duration_max: seconds as integer or null
+- key_hint: musical key string or null
+- is_film_song: true/false/null
 - lyrics_hint: quoted or described lyric phrase or null
 - language: language name or null
 
-Examples:
+═══ EXAMPLES ═══
+
+Query: "rajini arr songs"
+Output: {{"mood": null, "tempo": null, "energy": null, "valence": null, "time_of_day": null, "activity": null, "genre_hints": null, "tamil_genre_hints": null, "composer_hints": ["A.R. Rahman"], "director_hints": null, "lyricist_hints": null, "artist_hints": null, "cast_hints": ["Rajinikanth"], "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": "tamil"}}
+
+Query: "maniratnam harris jayaraj songs"
+Output: {{"mood": null, "tempo": null, "energy": null, "valence": null, "time_of_day": null, "activity": null, "genre_hints": null, "tamil_genre_hints": null, "composer_hints": ["Harris Jayaraj"], "director_hints": ["Mani Ratnam"], "lyricist_hints": null, "artist_hints": null, "cast_hints": null, "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": null}}
+
+Query: "vijay dance numbers by anirudh"
+Output: {{"mood": "energetic", "tempo": "fast", "energy": "high", "valence": null, "time_of_day": null, "activity": "dance", "genre_hints": null, "tamil_genre_hints": ["kuthu"], "composer_hints": ["Anirudh Ravichander"], "director_hints": null, "lyricist_hints": null, "artist_hints": null, "cast_hints": ["Vijay"], "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": "tamil"}}
+
+Query: "soft romantic songs from shankar films"
+Output: {{"mood": "romantic", "tempo": "slow", "energy": "low", "valence": "happy", "time_of_day": null, "activity": null, "genre_hints": null, "tamil_genre_hints": ["melody"], "composer_hints": null, "director_hints": ["Shankar"], "lyricist_hints": null, "artist_hints": null, "cast_hints": null, "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": null}}
+
+Query: "late night chill songs"
+Output: {{"mood": "chill", "tempo": "slow", "energy": "low", "valence": "neutral", "time_of_day": "night", "activity": null, "genre_hints": null, "tamil_genre_hints": null, "composer_hints": null, "director_hints": null, "lyricist_hints": null, "artist_hints": null, "cast_hints": null, "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": null}}
 
 Query: "sad Ilaiyaraaja songs from the 80s"
-Output: {{"mood": "sad", "tempo": null, "energy": null, "valence": "sad", "time_of_day": null, "activity": null, "genre_hints": null, "tamil_genre_hints": null, "composer_hints": ["Ilaiyaraaja"], "lyricist_hints": null, "artist_hints": null, "cast_hints": null, "film_hints": null, "year_from": 1980, "year_to": 1989, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": "tamil"}}
+Output: {{"mood": "sad", "tempo": "slow", "energy": "low", "valence": "sad", "time_of_day": null, "activity": null, "genre_hints": null, "tamil_genre_hints": null, "composer_hints": ["Ilaiyaraaja"], "director_hints": null, "lyricist_hints": null, "artist_hints": null, "cast_hints": null, "film_hints": null, "year_from": 1980, "year_to": 1989, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": "tamil"}}
 
-Query: "songs of Kajal Aggarwal"
-Output: {{"mood": null, "tempo": null, "energy": null, "valence": null, "time_of_day": null, "activity": null, "genre_hints": null, "tamil_genre_hints": null, "composer_hints": null, "lyricist_hints": null, "artist_hints": null, "cast_hints": ["Kajal Aggarwal"], "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": null}}
+Query: "feel good hindi songs after 2010"
+Output: {{"mood": "happy", "tempo": null, "energy": "medium", "valence": "happy", "time_of_day": null, "activity": null, "genre_hints": null, "tamil_genre_hints": null, "composer_hints": null, "director_hints": null, "lyricist_hints": null, "artist_hints": null, "cast_hints": null, "film_hints": null, "year_from": 2010, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": "hindi"}}
+
+Query: "workout pump up songs"
+Output: {{"mood": "energetic", "tempo": "fast", "energy": "high", "valence": null, "time_of_day": null, "activity": "workout", "genre_hints": null, "tamil_genre_hints": null, "composer_hints": null, "director_hints": null, "lyricist_hints": null, "artist_hints": null, "cast_hints": null, "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": null}}
+
+Query: "breakup songs sung by sid sriram"
+Output: {{"mood": "sad", "tempo": "slow", "energy": "low", "valence": "sad", "time_of_day": null, "activity": null, "genre_hints": null, "tamil_genre_hints": null, "composer_hints": null, "director_hints": null, "lyricist_hints": null, "artist_hints": ["Sid Sriram"], "cast_hints": null, "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": null}}
 
 Query: "penned by Vaali slow melodies"
-Output: {{"mood": null, "tempo": "slow", "energy": null, "valence": null, "time_of_day": null, "activity": null, "genre_hints": ["melody"], "tamil_genre_hints": ["melody"], "composer_hints": null, "lyricist_hints": ["Vaali"], "artist_hints": null, "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": "tamil"}}
+Output: {{"mood": null, "tempo": "slow", "energy": null, "valence": null, "time_of_day": null, "activity": null, "genre_hints": ["melody"], "tamil_genre_hints": ["melody"], "composer_hints": null, "director_hints": null, "lyricist_hints": ["Vaali"], "artist_hints": null, "cast_hints": null, "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": "tamil"}}
+
+Query: "songs of Kajal Aggarwal"
+Output: {{"mood": null, "tempo": null, "energy": null, "valence": null, "time_of_day": null, "activity": null, "genre_hints": null, "tamil_genre_hints": null, "composer_hints": null, "director_hints": null, "lyricist_hints": null, "artist_hints": null, "cast_hints": ["Kajal Aggarwal"], "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": null}}
+
+Query: "maniratnam songs"
+Output: {{"mood": null, "tempo": null, "energy": null, "valence": null, "time_of_day": null, "activity": null, "genre_hints": null, "tamil_genre_hints": null, "composer_hints": null, "director_hints": ["Mani Ratnam"], "lyricist_hints": null, "artist_hints": null, "cast_hints": null, "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": null}}
+
+Query: "rajini songs"
+Output: {{"mood": null, "tempo": null, "energy": null, "valence": null, "time_of_day": null, "activity": null, "genre_hints": null, "tamil_genre_hints": null, "composer_hints": null, "director_hints": null, "lyricist_hints": null, "artist_hints": null, "cast_hints": ["Rajinikanth"], "film_hints": null, "year_from": null, "year_to": null, "duration_min": null, "duration_max": null, "key_hint": null, "is_film_song": null, "lyrics_hint": null, "language": "tamil"}}
 
 Now extract tags for this query. Return ONLY the JSON object, no explanation:
 Query: "{prompt}"
@@ -83,7 +202,77 @@ Output:"""
 
 
 import logging as _logging
+import re as _re
+
 _log = _logging.getLogger(__name__)
+
+# Token-level spelling correction applied before LLM tag extraction.
+# Keyed by lowercase token; value is the replacement inserted into the query.
+# Only covers cases where the token is unambiguous enough to hard-correct.
+_SPELL_MAP: dict[str, str] = {
+    # Actors
+    "rajni": "rajini", "rajinee": "rajini", "ranjini": "rajini",
+    "kamalhasan": "kamal", "kamaal": "kamal",
+    "vijjai": "vijay", "thaalpathy": "thalapathy",
+    "ajit": "ajith", "ajiths": "ajith",
+    "danush": "dhanush", "dhansh": "dhanush",
+    "surya": "suriya", "suria": "suriya",
+    "vikrum": "vikram",
+    "silambu": "simbu", "silambarasan": "simbu",
+    "siva karthikeyan": "sivakarthikeyan", "sivakarthik": "sivakarthikeyan",
+    "nayantara": "nayanthara", "nayan": "nayanthara",
+    "samanta": "samantha",
+    "maheshbabu": "mahesh babu",
+    "prabas": "prabhas",
+    "alluarjun": "allu arjun", "bunny": "allu arjun",
+    "ramcharan": "ram charan",
+    # Directors
+    "mani rathnam": "maniratnam", "manirathnam": "maniratnam",
+    "shankaar": "shankar", "s shankar": "shankar",
+    "athlee": "atlee",
+    "lokesh kangaraj": "lokesh kanagaraj", "lk": "lokesh kanagaraj",
+    "gautam menon": "gautham menon", "gautam": "gautham",
+    "vetrimaran": "vetrimaaran", "vetri maaran": "vetrimaaran",
+    "paranjith": "pa ranjith",
+    "selva": "selvaraghavan", "selvaragavan": "selvaraghavan",
+    "rajeev menon": "rajiv menon",
+    "karthick subbaraj": "karthik subbaraj",
+    # Composers
+    "rehman": "rahman", "rehmann": "rahman", "rahmaan": "rahman",
+    "ilayaraja": "ilaiyaraaja", "ilaiah raja": "ilaiyaraaja", "ilayraaja": "ilaiyaraaja",
+    "harish jayaraj": "harris jayaraj", "harris jayraj": "harris jayaraj",
+    "yuvanshankar": "yuvan shankar raja", "yuvan shankar": "yuvan shankar raja",
+    "anirud": "anirudh", "aniruth": "anirudh",
+    "devisriprasad": "devi sri prasad",
+    "gvprakash": "gv prakash", "gv prakash kumar": "gv prakash",
+    "dimman": "d imman",
+    "vidhyasagar": "vidyasagar",
+    "sarajkumar": "sa rajkumar", "sa rajkumaar": "sa rajkumar",
+    "hiphoptamizha": "hip hop tamizha",
+    "ss thaman": "thaman", "s thaman": "thaman",
+    "manisharma": "mani sharma",
+    # Singers
+    "s p balasubrahmanyam": "spb", "balasubramaniam": "spb",
+    "sidsriram": "sid sriram",
+    "chinmayi sripada": "chinmayi",
+    "shreya ghosal": "shreya ghoshal",
+    "andrea jeremiah": "andrea",
+    "unni krishnan": "unnikrishnan",
+    "sp sailaja": "sailaja",
+}
+
+# Sort by length descending so longer phrases match before their substrings
+_SPELL_PAIRS = sorted(_SPELL_MAP.items(), key=lambda kv: len(kv[0]), reverse=True)
+
+
+def _normalize_query(prompt: str) -> str:
+    """Fix common spelling mistakes/typos before LLM tag extraction."""
+    lower = prompt.lower()
+    for wrong, right in _SPELL_PAIRS:
+        if wrong in lower:
+            lower = lower.replace(wrong, right)
+    # Restore original casing for words not in our map (keep LLM's job easy)
+    return lower
 
 
 async def extract_query_tags(prompt: str) -> dict:
@@ -93,9 +282,9 @@ async def extract_query_tags(prompt: str) -> dict:
                 f"{settings.OLLAMA_HOST}/api/generate",
                 json={
                     "model":   settings.OLLAMA_MODEL,
-                    "prompt":  TAG_EXTRACTION_PROMPT.format(prompt=prompt),
+                    "prompt":  TAG_EXTRACTION_PROMPT.format(prompt=_normalize_query(prompt)),
                     "stream":  False,
-                    "options": {"temperature": 0.1, "num_predict": 350},
+                    "options": {"temperature": 0.1, "num_predict": 450},
                 },
                 timeout=45,
             )
@@ -180,6 +369,14 @@ def build_filters(
     for artist in (tags.get("artist_hints") or []):
         if artist:
             must.append(FieldCondition(key="artist", match=MatchText(text=artist)))
+
+    # ── Director ──────────────────────────────────────
+    for director in (tags.get("director_hints") or []):
+        if director:
+            must.append(FieldCondition(
+                key="cultural_meta.film_meta.director",
+                match=MatchText(text=director),
+            ))
 
     # ── Cast / actor / actress ────────────────────────
     for actor in (tags.get("cast_hints") or []):

@@ -2,8 +2,16 @@
 from fastapi import APIRouter
 from qdrant_client import QdrantClient
 from config import settings, TEXT_COLLECTION, AUDIO_COLLECTION
+from core.suggestions import invalidate_cache as invalidate_suggestions
 
 router = APIRouter()
+
+
+@router.post("/invalidate-cache")
+async def invalidate_cache():
+    """Invalidate suggestion cache — called automatically after indexing."""
+    invalidate_suggestions()
+    return {"status": "ok", "message": "Suggestion cache invalidated"}
 
 
 @router.get("/status")
